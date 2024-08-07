@@ -1,0 +1,56 @@
+﻿from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, BitsAndBytesConfig
+from peft import PeftModel
+import torch
+
+def initialize_bnb_config(use_4bit=True, quant_type="nf4", compute_dtype="float16", use_nested_quant=False):
+    compute_dtype = getattr(torch, compute_dtype)
+    return BitsAndBytesConfig(
+        load_in_4bit=use_4bit,
+        bnb_4bit_quant_type=quant_type,
+        bnb_4bit_compute_dtype=compute_dtype,
+        bnb_4bit_use_double_quant=use_nested_quant,
+    )
+
+def load_model(model_name, device_map, bnb_config):
+    base_model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        low_cpu_mem_usage=True,
+        return_dict=True,
+        torch_dtype=torch.float16,
+        device_map=device_map,
+    )
+    return base_model
+
+def merge_models(base_model, fine_tuned_model_path):
+    model = PeftModel.from_pretrained(base_model, fine_tuned_model_path)
+    return model.merge_and_unload()
+
+def load_tokenizer(model_name):
+    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side = "right"
+    return tokenizer
+
+def generate_text(model, tokenizer, prompt, max_new_tokens=8000):
+    input_length = len(tokenizer(prompt)['input_ids'])
+    max_model_length = 8192  # 假設模型的最大長度限制為 8192 tokens
+
+    # 計算可用於生成的最大 tokens 數
+    max_tokens = max_model_length - input_length
+
+    if max_tokens <= 0:
+        print("輸入長度已超過模型限制，請縮短輸入。")
+        return ""
+    
+    # 確保不超過用戶指定的 max_new_tokens
+    max_tokens = min(max_tokens, max_new_tokens)
+
+    pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer)
+    result = pipe(prompt, max_new_tokens=max_tokens, truncation=True)
+    generated_text = result[0]['generated_text']
+    
+    # 去除 prompt 部分的文本
+    if generated_text.startswith(prompt):
+        generated_text = generated_text[len(prompt):]
+    
+    return generated_text

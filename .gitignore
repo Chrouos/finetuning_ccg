@@ -1,2 +1,6 @@
 ﻿model/
+qlora/
 mlx-examples/
+final_output/
+*.pyc
+
