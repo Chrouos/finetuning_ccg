@@ -3,6 +3,9 @@ import json
 import random
 import os
 import argparse
+
+random.seed(42)
+
 '''
     1. 以賠償給原告的數據填寫。
     2. 判決前的賠償金額需要包含：零件、材料、工資、鈑金、塗裝、烤漆。
@@ -160,7 +163,6 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     prepare_data(args.data_path, args.type, args.output_path)
-    
     
     # python ./data/processed_data.py  --type format_data_text --data_path ./data/finetuning_training_data_golden.jsonl --output_path ./data/ccg/
      

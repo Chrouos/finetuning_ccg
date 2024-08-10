@@ -3,7 +3,7 @@
 #: Configuration
 model_name = "./model/Llama3-8B-Chinese-Chat/"
 finetuning_model_name = "meta-chinese-format"
-checkpoint = "checkpoint-600" # "original"
+checkpoint = "checkpoint-600" # "checkpoint-600" # "original"
 
 #: Output
 output_path = f"./data/output/{finetuning_model_name}/"

@@ -10,8 +10,8 @@ with open(output_eval_path, 'r', encoding='utf-8-sig') as f:
     datas = [json.loads(line) for line in f]
     
 result = []
-for data in tqdm(datas[100:]):
-    prompt = f"{data['input']}"
+for data in tqdm(datas):
+    prompt = f'{data["input"]}'
     load_response = []
     generated_text = {}
     
