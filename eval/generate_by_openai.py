@@ -4,7 +4,7 @@ import json
 import os
 
 output_eval_path = "./data/ccg/format/eval.jsonl"
-client = OpenAI(api_key="sk-proj-5yX70bMfpyRVEP1yTtiUT3BlbkFJgWNkjYPkx7VCuvhZIc4z")
+client = OpenAI(api_key="")
 
 with open(output_eval_path, 'r', encoding='utf-8-sig') as f:
     datas = [json.loads(line) for line in f]
