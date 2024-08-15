@@ -31,3 +31,17 @@ git clone https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct
 ```
 git clone https://github.com/artidoro/qlora.git
 ```
+
+## Environment
+
+`pip install -r requirement.txt`
+
++ 微調
+```
+pip install transformers==4.31.0
+```
+
++ eval
+```
+pip install  git+https://github.com/huggingface/transformers.git
+```
