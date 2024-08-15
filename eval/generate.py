@@ -1,9 +1,9 @@
 ﻿from utils.cor_model import *
 
 #: Configuration
-model_name = "./model/Llama3-8B-Chinese-Chat/"
-finetuning_model_name = "meta-chinese-format"
-checkpoint = "checkpoint-600" # "checkpoint-600" # "original"
+model_name = "./model/Meta-Llama-3.1-8B/"
+finetuning_model_name = "meta-llama3.1-format"
+checkpoint = "original" # "checkpoint-600" # "original"
 
 #: Output
 output_path = f"./data/output/{finetuning_model_name}/"
@@ -16,11 +16,9 @@ device_map = {"": 0}
 # Initialize configuration and load model
 bnb_config = initialize_bnb_config()
 base_model = load_model(model_name, device_map, bnb_config)
-model = merge_models(base_model, fine_tuned_model_path)
+# model = merge_models(base_model, fine_tuned_model_path)
 
-# Load tokenizer and generate text
 tokenizer = load_tokenizer(model_name)
-
 
 # ------------------------------------------------------------------------------------------------------------------------
 
@@ -39,7 +37,7 @@ for data in tqdm(datas):
     load_response = []
     
     try:
-        generated_text = generate_text(model, tokenizer, prompt)
+        generated_text = generate_text(base_model, tokenizer, prompt)
         print(generated_text)
     except Exception as e:
         print(e)
