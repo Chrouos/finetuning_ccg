@@ -1,9 +1,9 @@
 ﻿from utils.cor_model import *
 
 #: Configuration
-model_name = "./model/Meta-Llama-3.1-8B/"
-finetuning_model_name = "meta-llama3.1-format"
-checkpoint = "original" # "checkpoint-600" # "original"
+model_name = "./model/Meta-Llama-3.1-8B/"       # select the base model
+finetuning_model_name = "meta-llama3.1-format"  # the folder name of output
+checkpoint = "original"                         # output name
 
 #: Output
 output_path = f"./data/output/{finetuning_model_name}/"

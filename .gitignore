@@ -4,3 +4,6 @@ mlx-examples/
 final_output/
 *.pyc
 
+eval/.env
+.env
+data/fetch_newst_labeler.sh
