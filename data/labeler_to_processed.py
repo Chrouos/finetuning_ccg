@@ -22,7 +22,7 @@ def process_data(json_data_list):
         
     return result_list
 
-source_path = "./labeler/*"
+source_path = "./data/labeler/*"
 folder_list = glob(source_path)
 
 for folder_path in folder_list:
@@ -44,3 +44,5 @@ for folder_path in folder_list:
             for item in result_processed_list:
                 file.write(json.dumps(item, ensure_ascii=False) + "\n")
         
+        
+# python ./data/labeler_to_processed.py 
