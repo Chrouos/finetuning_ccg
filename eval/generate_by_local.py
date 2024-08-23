@@ -8,7 +8,7 @@ checkpoint = "original"                         # output name
 
 #: Output
 output_path = f"./data/output/{finetuning_model_name}/"
-output_eval_path = "./data/ccg/format/eval.jsonl"
+instruction_data_path = "./data/ccg/format/eval.jsonl"
 eval_file_name = f'eval-{checkpoint}.jsonl'
 
 fine_tuned_model_path = f"./final_output/{finetuning_model_name}/{checkpoint}/"
@@ -29,7 +29,7 @@ import os
 from tqdm import tqdm
 
 
-with open(output_eval_path, 'r', encoding='utf-8-sig') as f:
+with open(instruction_data_path, 'r', encoding='utf-8-sig') as f:
     datas = [json.loads(line) for line in f]
 
 result = []

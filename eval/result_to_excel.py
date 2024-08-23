@@ -21,13 +21,6 @@ for path in file_paths:
 # 創建 DataFrame
 df = pd.DataFrame(combine_list)
 
-# 計算平均值
-numeric_columns = df.select_dtypes(include='number').columns
-average_values = df[numeric_columns].mean(axis=1)
-
-# 插入 "Average" 欄位到第二列
-df.insert(1, 'Average', average_values)
-
 # 存入 Excel 檔案
 df.to_excel(output_file, index=False)
 

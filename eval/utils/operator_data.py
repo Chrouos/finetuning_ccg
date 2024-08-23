@@ -2,10 +2,58 @@
 import cn2an
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics import mean_absolute_percentage_error
 import os
 
 import re
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+import numpy as np
+
+def calculate_average_cosine_similarity(text_list_1, text_list_2):
+    vectorizer = CountVectorizer(stop_words='english')
+    total_similarity = 0
+    valid_pairs = 0
+
+    for text1, text2 in zip(text_list_1, text_list_2):
+        text1 = str(text1)
+        text2 = str(text2)
+        
+        if text1.strip() and text2.strip():  # 檢查非空字串
+            corpus = [text1, text2]
+            vectors = vectorizer.fit_transform(corpus)
+            if vectors.shape[1] > 0:  # 檢查詞彙表是否為空
+                similarity = cosine_similarity(vectors)
+                total_similarity += similarity[0][1]
+                valid_pairs += 1
+
+    if valid_pairs == 0:
+        return 0  # 如果沒有有效的字串對，返回0或其他預設值
+
+    average_similarity = total_similarity / valid_pairs
+    return average_similarity
+
+def log_cosh_loss(y_true, y_pred):
+    y_true, y_pred = np.array(y_true, dtype=np.float64), np.array(y_pred, dtype=np.float64)
+    
+    # 動態縮放因子，僅根據 y_true 計算，防止溢位
+    data_range = np.max(np.abs(y_true))
+    if data_range > 1000:
+        scaling_factor = 1e-5  # 進一步縮小縮放因子
+    elif data_range > 10:
+        scaling_factor = 1e-3
+    else:
+        scaling_factor = 1.0
+    
+    def _log_cosh(x):
+        # 使用數值穩定的公式來避免溢位
+        return np.where(np.abs(x) > 20, np.abs(x) - np.log(2), np.log(np.cosh(x)))
+    
+    # 使用縮放後的差異值來計算
+    loss = _log_cosh(scaling_factor * (y_pred - y_true))
+    
+    # 將損失除以縮放因子以保持量級
+    return np.mean(loss) / scaling_factor
+
 
 # - 分割文字
 def text_splitter_RecursiveCharacterTextSplitter(text, chunk_size=1024, chunk_overlap=0):
@@ -153,8 +201,9 @@ def transform_chinese_number_to_int(value):
         專換為數字且預設為 0
     '''
     default_value = 0
+    result_value = 0
     
-    if value is None or value == "無": return default_value
+    if value is None or value == "無": result_value = default_value
     
     try:
         # pattern = r'\d+'
@@ -162,20 +211,22 @@ def transform_chinese_number_to_int(value):
         
         # chinese_number = numbers[0]
         chinese_number = str(value).replace(",", "").replace("元", "").replace(" ", "").replace("月薪", "").replace("年", "").replace("每月", "")
-        if chinese_number is None or chinese_number == "": return 0
+        if chinese_number is None or chinese_number == "": return result_value
         
         try:
-            return cn2an.cn2an(chinese_number, "smart")
+            result_value = cn2an.cn2an(chinese_number, "smart")
         except Exception:
             try:
                 return int(chinese_number_to_int(chinese_number))
             except Exception as e:
                 # print("transform_chinese_number_to_int_", e)
-                return default_value
+                result_value = default_value
             
     except Exception as e:
-        print("transform_chinese_number_to_int", e)
-        return default_value 
+        # print("transform_chinese_number_to_int", e)
+        result_value =  default_value 
+        
+    return result_value
     
 
 # - 轉換分數到數值
@@ -214,17 +265,12 @@ def blame_fraction_to_int(value):
         
         if isinstance(clear_value, int) == False: return default_value
         
-        return clear_value
+        return str(clear_value)
         
     except Exception as e:
-        return default_value
+        return str(default_value)
     
-def calculate_cosine_similarity(text1, text2):
-    vectorizer = CountVectorizer()
-    corpus = [text1, text2]
-    vectors = vectorizer.fit_transform(corpus)
-    similarity = cosine_similarity(vectors)
-    return similarity[0][1]
+
 
 def custom_mean_number(number):
     
@@ -333,7 +379,8 @@ def date_regular(text, is_default_day=False):
                 result = chinese_char_to_int(f"{year}年{month}月{day}日", zero_normalize=True)
         else:
             result = ch_in_text
-        return result
+            
+        return str(result)
     
     except Exception as e:
         return text

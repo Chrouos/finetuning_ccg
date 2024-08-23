@@ -2,6 +2,7 @@
 import re
 import numpy as np
 import copy
+from tqdm import tqdm
 
 from glob import glob
 import os
@@ -12,8 +13,19 @@ final_result_fields, template_dict, fields_setting = get_fields()
 from utils.operator_data import *
 
 #: Args.
-gloden_answer = "./data/ccg/format/eval.jsonl"
-finetuning_model_name_list = ["openai", "meta-llama-format", "meta-chinese-format"]
+gloden_answer = "./data/instruction/format/eval.jsonl"
+finetuning_model_name_list = [
+    "gpt-0125-finetuning-advanced", 
+    "meta-llama-format-instruct-advanced", 
+    "meta-chinese-format-advanced",
+    "RE",
+    "gpt-0125-basic",
+    "gpt-0125-advanced",
+    "gpt-0125_oneshot",
+    "GEMINI-basic",
+    "GEMINI-advanced",
+    "gemini-oneshot",
+]
 
 consoletext=[]
 for finetuning_model_name in finetuning_model_name_list:
@@ -31,7 +43,6 @@ for finetuning_model_name in finetuning_model_name_list:
         with open(pre_output_path + processed_file_name, 'r', encoding='utf-8-sig') as f:
             processed_data = [json.loads(line) for line in f]
             # processed
-        original_processed_data = copy.deepcopy(processed_data)
             
         with open(gloden_answer, 'r', encoding='utf-8-sig') as f:
             gloden_data = [json.loads(line) for line in f]
@@ -40,10 +51,10 @@ for finetuning_model_name in finetuning_model_name_list:
         #- regular
         def regular_process_item(item_dict, output_dict, fields_setting, template_dict):
             current_item_dict = template_dict.copy()
+            
             for key, value in output_dict.items():
-                if value is None:
-                    current_item_dict[key] = ""
-                elif key in fields_setting['number_fields']:
+                
+                if key in fields_setting['number_fields']:
                     current_item_dict[key] = transform_chinese_number_to_int(value)
                 elif key in fields_setting['fraction_fields']:
                     current_item_dict[key] = blame_fraction_to_int(value)
@@ -70,98 +81,43 @@ for finetuning_model_name in finetuning_model_name_list:
         data_total_length = len(processed_data)
             
         #- eval
-        comparison_diff_dict = [{field: "" for field in final_result_fields} for _ in range(data_total_length)] # = total_comparison_diff_dict # = 每一格的差異
-        comparison_gap_dict = {field: 0 for field in final_result_fields} # = total_comparison_gap_dict # = 差異的總和
-        comparison_worst_diff = {field: 0 for field in final_result_fields } # = total_comparison_worst_diff # = 獲得總差異(最差最差的情況)
-
-        efficient_count = 0
-        for index, item in enumerate(original_processed_data):
-            # if item['processed'] == {}: pass
-            # else: efficient_count += 1
+        efficient_count = 0 # 共有幾筆資料
+        original_processed_data = copy.deepcopy(processed_data)
+        
+        golden_y_true_list = {field: [] for field in final_result_fields} # = 準備序列
+        processed_y_pred_list = {field: [] for field in final_result_fields} # = 準備序列
+        
+        # @ 獲得序列
+        for index_outer, row in enumerate(original_processed_data):
             
-            #- 檢查跳過項目
-            is_pass = True
-            if len(gloden_data[index]['input']) <= 9000:
-                is_pass = False
+            # 計數
+            for item_key in final_result_fields:
+                golden_y_true_list[item_key].append(original_processed_data[index_outer]['processed'][item_key])
+                processed_y_pred_list[item_key].append(gloden_data[index_outer]['output'][item_key])
             
-            for check_is_error_item in gloden_data[index]['output']:
-                if check_is_error_item == '被告肇責': pass
-                elif gloden_data[index]['output'][check_is_error_item] != "" and gloden_data[index]['output'][check_is_error_item] != 0:
-                    is_pass = False
-                    break
-                
-            if is_pass: continue
-            else: efficient_count += 1
+        # @ 計算
+        eval_result_dict = {field: 0 for field in final_result_fields}       # 結論
+        eval_result_count_dict = {field: {"golden": 0, "processed": 0} for field in final_result_fields} # 共有幾筆
+        for item_key in final_result_fields:
             
-            for key in final_result_fields:
-                try:
-                    # @ 比對 數字類 (數字、分數、天數)
-                    if key in fields_setting['number_fields'] + fields_setting['fraction_fields'] + fields_setting['day_fields']:
-                        diff = int(gloden_data[index]['output'].get(key, 0)) - int( processed_data[index]['processed'].get(key, 0)) # = 當前的差異
-                        
-                        comparison_diff_dict[index][key] = diff # = 每一格的差異
-                        comparison_gap_dict[key] += abs(diff) # = 差異的總和
-                        comparison_worst_diff[key] += max(int( gloden_data[index]['output'].get(key, 0)), int( processed_data[index]['processed'].get(key, 0))) 
-                        # = 獲得總差異(最差最差的情況)
-                        
-                        # if diff != 0:
-                        #     print(f"ORI:{int(gloden_data[index]['output'].get(key, 0))}")
-                        #     print(f"PRO:{int( processed_data[index]['processed'].get(key, 0)) }")
-                        #     print(key, diff, comparison_gap_dict[key])
-                        
-                    # @ 比對 字串類 (字串、日期)
-                    elif key in fields_setting['string_fields'] + fields_setting['date_fields']:
-                        
-                        if gloden_data[index]['output'][key] is np.nan: text_kernel = ""
-                        else: text_kernel = gloden_data[index]['output'].get(key, "")
-                        if processed_data[index]['processed'][key] is np.nan: text_basic = ""
-                        else: text_basic = processed_data[index]['processed'].get(key, "")
-                        
-                        # @ 比對
-                        if text_basic == "" and text_kernel == "": comparison_gap_dict[key] += 1
-                        elif text_basic == "" and text_kernel != "": comparison_gap_dict[key] += 0 # comparison_diff_dict[index][key] = comparison_user_basic[0:2] # = 每一格的差異
-                        elif text_basic != "" and text_kernel == "": comparison_gap_dict[key] += 1 # comparison_diff_dict[index][key] = comparison_user_kernel[0:2] # = 每一格的差異
-                        else: comparison_gap_dict[key] += calculate_cosine_similarity(text_basic, text_kernel)
-                        # print(key, comparison_gap_dict[key], f"({text_basic}, {text_kernel})")
-                        
-                        # if key == '事發經過':
-                        consoletext.append(f"[{file_path}]{key}\nG:{gloden_data[index]['output'][key]}\nP:{processed_data[index]['processed'][key]}\n=>{comparison_gap_dict[key]}\n")
-                    
-                except Exception as e:
-                    print(key, gloden_data[index]['output'][key], processed_data[index]['processed'][key],  e)
-                    
-                    
-        comparison_average_dict = {}
-        current_average_dict = {}
-        key_average_dict = {field: 0 for field in final_result_fields} 
-        for key, gap in comparison_gap_dict.items():
-            result = abs(gap)  # = 比絕對差異
-            try:
+            eval_result_count_dict[item_key]["golden"] = len(golden_y_true_list[item_key])
+            eval_result_count_dict[item_key]["processed"] = len(processed_y_pred_list[item_key])
+            
+            # @ 字串 
+            if item_key in fields_setting['string_fields'] + fields_setting['date_fields'] + fields_setting['fraction_fields']:
+                eval_result_dict[item_key] = calculate_average_cosine_similarity(golden_y_true_list[item_key], processed_y_pred_list[item_key])
                 
-                # - 如果是數值
-                if key in fields_setting['number_fields'] + fields_setting['fraction_fields'] + fields_setting['day_fields']:
-                    if comparison_worst_diff[key] != 0: 
-                        result = 1 - (result / comparison_worst_diff[key])
-                        # ~ 標準化 0 ~ 1 (數字)
-                    else: result = 1
-                    
-                # - 如果是字串
-                if key in fields_setting['string_fields'] + fields_setting['date_fields']: # = 原本是　０～ data_total_length
-                    result = result / efficient_count
-                    
-                current_average_dict[key] = round(result, 2)
-                key_average_dict[key] += abs(result) # = 最後總結
-                    
-            except Exception as e:
-                print(e)
+            # @ 數值
+            elif item_key in fields_setting['number_fields']  + fields_setting['day_fields']:
+                eval_result_dict[item_key] = log_cosh_loss(golden_y_true_list[item_key], processed_y_pred_list[item_key])
                 
-        print("---------", "current_average_dict:", finetuning_model_name, processed_file_name, "---------")
-        for key, average in current_average_dict.items():
-            print(key, average)
-
+            consoletext.append(f"{item_key}=>{eval_result_dict[item_key]}\nG=>{golden_y_true_list[item_key]}\nP=>{processed_y_pred_list[item_key]}\n")
+            
+        for key, value in eval_result_dict.items():
+            print(f"{finetuning_model_name} - {processed_file_name} - {key} ({str(eval_result_count_dict[item_key]['golden'])}) - {value}")
+            
         with open(eval_output_path + processed_file_name, 'w', encoding='utf-8-sig', newline='') as f:
-            for key, average in current_average_dict.items():
-                # 寫入鍵值對為一個字典格式
+            for key, average in eval_result_dict.items():
                 f.write(json.dumps({key: average}, ensure_ascii=False) + '\n')
                 
 with open('consoletext.txt', 'w', encoding='utf-8') as file:
