@@ -236,6 +236,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     prepare_data(args.data_path, args.type, args.output_path)
     
-    # python ./data/processed_data.py  --type format_data_text --data_path ./data/finetuning_training_data_golden.jsonl --output_path ./data/instruction/
+    # python ./data/processed_to_format.py  --type format_data_text --data_path ./data/finetuning_training_data_golden.jsonl --output_path ./data/instruction/
     
 

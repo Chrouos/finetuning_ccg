@@ -5,13 +5,20 @@ import os
 
 #: Args.
 finetuning_model_name_list = [
+    
     "gpt-0125-finetuning-advanced", 
     "meta-llama-format-instruct-advanced", 
     "meta-chinese-format-advanced",
-    "RE",
+    
+    "re-format",
+    
     "gpt-4o-mini-basic",
-    "gpt-4o-advanced",
-    "gpt-4o_oneshot",
+    "gpt-4o-mini-advanced",
+    "gpt-4o-mini-oneShot",
+    
+    "gemini-1.5-flash-basic",
+    "gemini-1.5-flash-advanced",
+    "gemini-1.5-flash-oneShot",
 ]
 
 for finetuning_model_name in finetuning_model_name_list:

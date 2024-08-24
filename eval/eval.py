@@ -15,16 +15,20 @@ from utils.operator_data import *
 #: Args.
 gloden_answer = "./data/instruction/format/eval.jsonl"
 finetuning_model_name_list = [
+    
     "gpt-0125-finetuning-advanced", 
     "meta-llama-format-instruct-advanced", 
     "meta-chinese-format-advanced",
-    "RE",
-    "gpt-0125-basic",
-    "gpt-0125-advanced",
-    "gpt-0125_oneshot",
-    "GEMINI-basic",
-    "GEMINI-advanced",
-    "gemini-oneshot",
+    
+    "re-format",
+    
+    "gpt-4o-mini-basic",
+    "gpt-4o-mini-advanced",
+    "gpt-4o-mini-oneShot",
+    
+    "gemini-1.5-flash-basic",
+    "gemini-1.5-flash-advanced",
+    "gemini-1.5-flash-oneShot",
 ]
 
 consoletext=[]

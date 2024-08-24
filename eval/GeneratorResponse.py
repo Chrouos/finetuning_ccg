@@ -160,7 +160,7 @@ class GeneratorResponse:
             "保險給付金額": [r"(保險){1}.*?[0-9].*?元"],                     
         }
         
-        current_re_item_dict_list = {"processed": {}}
+        current_re_item_dict_list = {}
 
         for fields in re_formula:
             
@@ -176,6 +176,6 @@ class GeneratorResponse:
                     break
                 
             # @ 存成字典
-            current_re_item_dict_list["processed"][fields] = result
+            current_re_item_dict_list[fields] = result
             
         return current_re_item_dict_list
