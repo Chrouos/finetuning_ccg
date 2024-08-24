@@ -4,12 +4,21 @@ from glob import glob
 import os
 
 #: Args.
-finetuning_model_name_list = ["openai", "meta-llama-format", "meta-chinese-format"]
+finetuning_model_name_list = [
+    "gpt-0125-finetuning-advanced", 
+    "meta-llama-format-instruct-advanced", 
+    "meta-chinese-format-advanced",
+    "RE",
+    "gpt-4o-mini-basic",
+    "gpt-4o-advanced",
+    "gpt-4o_oneshot",
+]
+
 for finetuning_model_name in finetuning_model_name_list:
 
     pre_output_path = f"./data/output/{finetuning_model_name}/"
     file_paths = [f for f in glob(pre_output_path + '*', recursive=True) if 'processed_' not in f ]
-
+    
     for file_path in file_paths:
         current_file_name = os.path.basename(file_path)
         

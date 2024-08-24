@@ -81,7 +81,6 @@ for finetuning_model_name in finetuning_model_name_list:
         data_total_length = len(processed_data)
             
         #- eval
-        efficient_count = 0 # 共有幾筆資料
         original_processed_data = copy.deepcopy(processed_data)
         
         golden_y_true_list = {field: [] for field in final_result_fields} # = 準備序列
@@ -89,6 +88,12 @@ for finetuning_model_name in finetuning_model_name_list:
         
         # @ 獲得序列
         for index_outer, row in enumerate(original_processed_data):
+            
+            #. 檢查忽略條件
+            is_pass = len(gloden_data[index_outer]['input']) > 9000  # 檢查字數
+            output_data = gloden_data[index_outer]['output']
+            if is_pass and any(value != "" and value != 0 for key, value in output_data.items() if key != '被告肇責'): continue
+                
             
             # 計數
             for item_key in final_result_fields:
