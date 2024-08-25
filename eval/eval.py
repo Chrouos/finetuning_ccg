@@ -29,6 +29,8 @@ finetuning_model_name_list = [
     "gemini-1.5-flash-basic",
     "gemini-1.5-flash-advanced",
     "gemini-1.5-flash-oneShot",
+    
+    "ft:gpt-4o-mini-2024-07-18:widm:advanced-train:9zZnglyr-advanced"
 ]
 
 consoletext=[]
@@ -120,7 +122,7 @@ for finetuning_model_name in finetuning_model_name_list:
             elif item_key in fields_setting['number_fields']  + fields_setting['day_fields']:
                 eval_result_dict[item_key] = log_cosh_loss(golden_y_true_list[item_key], processed_y_pred_list[item_key])
                 
-            consoletext.append(f"{item_key}=>{eval_result_dict[item_key]}\nG=>{golden_y_true_list[item_key]}\nP=>{processed_y_pred_list[item_key]}\n")
+            consoletext.append(f"[{file_path}] {item_key}=>{eval_result_dict[item_key]}\nG=>{golden_y_true_list[item_key]}\nP=>{processed_y_pred_list[item_key]}\n")
             
         for key, value in eval_result_dict.items():
             print(f"{finetuning_model_name} - {processed_file_name} - {key} ({str(eval_result_count_dict[item_key]['golden'])}) - {value}")

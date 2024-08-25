@@ -57,19 +57,19 @@ def prompt_ruler():
 def basicPrompt(judgement_doc="", json_dict={}):
     prompt = textwrap.dedent(f"""
     [INST]
-    根據給定的[CONTENT] 填充 [Extraction-JSON] 結構。要求如下:
-    1. 以賠償給原告的數據填寫。
-    2. 判決前的賠償金額需要包含：零件、材料、工資、鈑金、塗裝、烤漆。
-    返回結果為一行JSON格式字串，無換行或特殊符號。
-    [/INST]
-    
-    [Extraction-JSON]
-    {json_dict}
-    [/Extraction-JSON]
-    
     [CONTENT]
     {judgement_doc}
     [/CONTENT]
+    根據給定的[CONTENT] 填充 [Extraction-JSON] 結構。要求如下:
+    1. 以賠償給原告的數據填寫。
+    2. 判決前的賠償金額需要包含：零件、材料、工資、鈑金、塗裝、烤漆。
+    
+    要擷取文本原文，不要修改內容
+    返回結果為一行JSON格式字串，無換行或特殊符號。
+    [/INST]
+    [Extraction-JSON]
+    {json_dict}
+    [/Extraction-JSON]
     """)
             
     return prompt
@@ -77,22 +77,24 @@ def basicPrompt(judgement_doc="", json_dict={}):
 def advancedPrompt(judgement_doc="", json_dict={}):
     prompt = textwrap.dedent(f"""
     [INST]
-    根據給定的[CONTENT] 填充 [Extraction-JSON] 結構。要求如下:
-    1. 以賠償給原告的數據填寫。
+    [CONTENT]
+    {judgement_doc}
+    [/CONTENT]
+    根據給定的 [CONTENT] 填充 [Extraction-JSON] 結構。要求如下:
+    1. 以賠償給原告的數據填寫
     2. 判決前的賠償金額需要包含：零件、材料、工資、鈑金、塗裝、烤漆。
     3. 若無結果則留空白
     4. 注意每日每月之單位，一個月為30天
     5. 每日工作收入改填寫每月工作收入
-    返回結果為一行JSON格式字串，無換行或特殊符號。
-    [/INST]
+    6. 事發經過要擷取得更完整
+    7. 折舊方法為定率遞減法或平均法
     
+    要擷取文本原文，不要修改內容
+    返回結果為一行JSON格式字串，無換行或特殊符號。
     [Extraction-JSON]
     {json_dict}
     [/Extraction-JSON]
-    
-    [CONTENT]
-    {judgement_doc}
-    [/CONTENT]
+    [/INST]
     """)
     
     return prompt
@@ -100,26 +102,20 @@ def advancedPrompt(judgement_doc="", json_dict={}):
 def oneShotPrompt(judgement_doc="", json_dict={}):
     prompt = textwrap.dedent(f"""
     [INST]
-    根據給定的[CONTENT] 填充 [Extraction-JSON] 結構。要求如下:
-    1. 以賠償給原告的數據填寫。
-    2. 判決前的賠償金額需要包含：零件、材料、工資、鈑金、塗裝、烤漆。
-    3. 若無結果則留空白
-    4. 注意每日每月之單位，一個月為30天
-    5. 每日工作收入改填寫每月工作收入
+    [CONTENT]
+    {judgement_doc}
+    [/CONTENT]
+    根據給定的[CONTENT] 填充 [Extraction-JSON] 結構。要求如 [EXAMPLE]
+    要擷取文本原文，不要修改內容
     返回結果為一行JSON格式字串，無換行或特殊符號。
-    [/INST]
-    
     [Extraction-JSON]
     {json_dict}
     [/Extraction-JSON]
+    [/INST]
     
     [EXAMPLE]
     {prompt_ruler()}
     [/EXAMPLE]
-    
-    [CONTENT]
-    {judgement_doc}
-    [/CONTENT]
     """)
     
     return prompt

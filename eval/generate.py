@@ -3,11 +3,11 @@ import json
 import os
 from tqdm import tqdm
 
-GENERATE_MODE = "RE" # GPT | GEMINI | RE
+GENERATE_MODE = "GPT" # GPT | GEMINI | RE |
 
 #: Local Model Configuration
-prompt_level = "format"
-model_name = "re"                      # select the base model
+prompt_level = "advanced"                           # basic | advanced | oneShot
+model_name = "gpt-4o-mini"                          # gpt-4o-mini | gemini-1.5-flash
 checkpoint = "original"                             # output name
 
 #: Data
@@ -24,6 +24,7 @@ generator_response = GeneratorResponse(
     model_path="model/", 
     fine_tuned_model_path="final_output/"
 )
+
 
 with open(instruction_data_path, 'r', encoding='utf-8-sig') as f:
     datas = [json.loads(line) for line in f]

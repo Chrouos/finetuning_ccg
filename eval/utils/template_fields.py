@@ -9,14 +9,14 @@ fields_setting = {
         "事故車出廠日期",
         "傷勢",
         "職業",
-        "耐用年數",
         "折舊方法",
+        "被告肇責",
         
         "塗裝",
         "工資",
         "烤漆",
         "鈑金",
-        "被告肇責",
+        "耐用年數",
         "修車費用",
         "醫療費用",
         "賠償金額總額",
@@ -119,5 +119,7 @@ def get_fields():
     return final_result_fields, template_dict, fields_setting
     
 if __name__ in "__main__":
-    final_result_fields, template_dict = get_fields()
+    final_result_fields, template_dict, _ = get_fields()
     print(f"len of the template dict: {len(str(template_dict))}")
+    
+    print(template_dict)

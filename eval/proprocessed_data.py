@@ -19,7 +19,10 @@ finetuning_model_name_list = [
     "gemini-1.5-flash-basic",
     "gemini-1.5-flash-advanced",
     "gemini-1.5-flash-oneShot",
+    
+    # "ft:gpt-4o-mini-2024-07-18:widm:advanced-train:9zZnglyr-advanced"
 ]
+
 
 for finetuning_model_name in finetuning_model_name_list:
 
