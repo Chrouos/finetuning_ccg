@@ -3,6 +3,9 @@ from glob import glob
 import json
 import os
 
+string_field = ["事故日期", "事發經過", "事故車出廠日期", "傷勢", "職業", "折舊方法", "被告肇責",]
+int_field = ["塗裝", "工資","烤漆", "鈑金", "耐用年數","修車費用","醫療費用","賠償金額總額","保險給付金額","居家看護天數","居家看護費用","每日居家看護金額",]
+
 # 定義資料夾路徑
 file_path = "data/eval/"
 output_file = file_path + "combined_data.xlsx"
