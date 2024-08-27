@@ -132,7 +132,7 @@ for finetuning_model_name in finetuning_model_name_list:
             elif item_key in fields_setting['number_fields']  + fields_setting['day_fields']:
                 eval_result_dict[item_key] = log_cosh_loss(golden_y_true_list[item_key], processed_y_pred_list[item_key])
                 
-            consoletext.append(f"[{file_path}] {item_key}=>{eval_result_dict[item_key]}\nG=>{golden_y_true_list[item_key]}\nP=>{processed_y_pred_list[item_key]}\n")
+            consoletext.append(f"[{file_path}][{item_key}]\nGOLDEN=\n{golden_y_true_list[item_key]}\nGENERATE=\n{processed_y_pred_list[item_key]}\n\n")
             
         for key, value in eval_result_dict.items():
             print(f"{finetuning_model_name} - {processed_file_name} - {key} ({str(eval_result_count_dict[item_key]['golden'])}) - {value}")
@@ -146,5 +146,3 @@ with open('consoletext.txt', 'w', encoding='utf-8') as file:
         file.write(line + '\n')
         
         
-with open('sequencelist.json', 'w', encoding='utf-8') as file:
-    json.dump(sequence_list, file, ensure_ascii=False, indent=4)

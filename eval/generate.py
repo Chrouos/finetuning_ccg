@@ -6,7 +6,7 @@ from tqdm import tqdm
 GENERATE_MODE = "GPT" # GPT | GEMINI | RE |
 
 #: Local Model Configuration
-prompt_level = "oneShot"                           # basic | advanced | oneShot
+prompt_level = "basic"                           # basic | advanced | oneShot
 model_name = "gpt-4o-mini"                          # gpt-4o-mini | gemini-1.5-flash | gpt-3.5-turbo-0125
 checkpoint = "original"                             # output name
 
@@ -30,7 +30,8 @@ with open(instruction_data_path, 'r', encoding='utf-8-sig') as f:
     datas = [json.loads(line) for line in f]
     
 result = []
-for data in tqdm(datas[:50]):
+console_output = []
+for data in tqdm(datas[:25]):
     prompt = f"{data['input']}"
     load_response = []
     
@@ -53,7 +54,11 @@ for data in tqdm(datas[:50]):
                 content_text=data['content']
             )
         
-        print(generated_text)
+        # print(generated_text)
+        
+        sequence_list = f"GOL=\n{data['output']}\n-\nGEN=\n{generated_text}\n"
+        print(sequence_list)
+        console_output.append(sequence_list)
     except Exception as e:
         print(e)
         generated_text = {}
@@ -67,4 +72,6 @@ with open(save_output_path, 'w', encoding='utf-8-sig') as f:
         f.write(json.dumps(item, ensure_ascii=False) + '\n')
 
 
-
+with open('sequencelist.txt', 'w', encoding='utf-8') as file:
+    for line in sequence_list:
+        file.write(line + '\n')

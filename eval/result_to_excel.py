@@ -14,7 +14,8 @@ file_paths = [f for f in glob(file_path + '**/*.jsonl', recursive=True) if f != 
 # 合併所有檔案的內容成一個列表
 combine_list = []
 for path in file_paths:
-    combined_dict = {"Name": path}
+    # folder_name = os.path.basename(os.path.dirname(path))
+    combined_dict = {"Name": path.replace('data/eval/', '')}
     with open(path, 'r', encoding='utf-8-sig') as file:
         for line in file:
             line_dict = json.loads(line)
@@ -37,6 +38,7 @@ cols = df.columns.tolist()
 cols.insert(1, cols.pop(cols.index("Average(字串)")))  # 移動到第二列
 cols.insert(2, cols.pop(cols.index("Average(數值)")))  # 移動到第三列
 df = df[cols]
+df = df.sort_values(by="Name")
 
 # 存入 Excel 檔案
 df.to_excel(output_file, index=False)
