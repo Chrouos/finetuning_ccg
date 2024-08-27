@@ -6,8 +6,8 @@ from tqdm import tqdm
 GENERATE_MODE = "GPT" # GPT | GEMINI | RE |
 
 #: Local Model Configuration
-prompt_level = "basic"                           # basic | advanced | oneShot
-model_name = "gpt-4o-mini"                          # gpt-4o-mini | gemini-1.5-flash
+prompt_level = "oneShot"                           # basic | advanced | oneShot
+model_name = "gpt-4o-mini"                          # gpt-4o-mini | gemini-1.5-flash | gpt-3.5-turbo-0125
 checkpoint = "original"                             # output name
 
 #: Data
@@ -26,11 +26,11 @@ generator_response = GeneratorResponse(
 )
 
 
-with open(instruction_data_path[:100], 'r', encoding='utf-8-sig') as f:
+with open(instruction_data_path, 'r', encoding='utf-8-sig') as f:
     datas = [json.loads(line) for line in f]
     
 result = []
-for data in tqdm(datas):
+for data in tqdm(datas[:50]):
     prompt = f"{data['input']}"
     load_response = []
     

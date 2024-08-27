@@ -16,24 +16,28 @@ from utils.operator_data import *
 gloden_answer = "./data/instruction/format/eval.jsonl"
 finetuning_model_name_list = [
     
-    "gpt-0125-finetuning-advanced", 
-    "meta-llama-format-instruct-advanced", 
-    "meta-chinese-format-advanced",
+    # "gpt-3.5-turbo-0125-basic",
+    # "gpt-3.5-turbo-0125-advanced",
     
-    "re-format",
+    # "gpt-0125-finetuning-advanced", 
+    # "meta-llama-format-instruct-advanced", 
+    # "meta-chinese-format-advanced",
+    
+    # "re-format",
     
     "gpt-4o-mini-basic",
     "gpt-4o-mini-advanced",
     "gpt-4o-mini-oneShot",
     
-    "gemini-1.5-flash-basic",
-    "gemini-1.5-flash-advanced",
-    "gemini-1.5-flash-oneShot",
+    # "gemini-1.5-flash-basic",
+    # "gemini-1.5-flash-advanced",
+    # "gemini-1.5-flash-oneShot",
     
-    "ft:gpt-4o-mini-2024-07-18:widm:advanced-train:9zZnglyr-advanced"
+    # "ft:gpt-4o-mini-2024-07-18:widm:advanced-train:9zZnglyr-advanced"
 ]
 
 consoletext=[]
+sequence_list=[]
 for finetuning_model_name in finetuning_model_name_list:
 
     pre_output_path = f"./data/output/{finetuning_model_name}/"
@@ -106,6 +110,12 @@ for finetuning_model_name in finetuning_model_name_list:
                 golden_y_true_list[item_key].append(original_processed_data[index_outer]['processed'][item_key])
                 processed_y_pred_list[item_key].append(gloden_data[index_outer]['output'][item_key])
             
+        sequence_list.append({
+            "file_path": file_path,
+            "golden_y_true_list": golden_y_true_list,
+            "processed_y_pred_list": processed_y_pred_list
+        })
+            
         # @ 計算
         eval_result_dict = {field: 0 for field in final_result_fields}       # 結論
         eval_result_count_dict = {field: {"golden": 0, "processed": 0} for field in final_result_fields} # 共有幾筆
@@ -134,3 +144,7 @@ for finetuning_model_name in finetuning_model_name_list:
 with open('consoletext.txt', 'w', encoding='utf-8') as file:
     for line in consoletext:
         file.write(line + '\n')
+        
+        
+with open('sequencelist.json', 'w', encoding='utf-8') as file:
+    json.dump(sequence_list, file, ensure_ascii=False, indent=4)

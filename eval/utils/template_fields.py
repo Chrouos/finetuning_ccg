@@ -26,23 +26,23 @@ fields_setting = {
         "每日居家看護金額",
         
         # 
-        "精神賠償",
-        "每日住院看護金額",
-        "住院看護天數",
-        "住院看護費用",
-        "看護總額",
-        "每日營業收入",
-        "營業損失天數",
-        "營業損失",
-        "每日工作收入",
-        "工作損失天數",
-        "工作損失",
-        "零件",
-        "材料",
-        "交通費用",
-        "財產損失",
-        "其他",
-        "備註"
+        # "精神賠償",
+        # "每日住院看護金額",
+        # "住院看護天數",
+        # "住院看護費用",
+        # "看護總額",
+        # "每日營業收入",
+        # "營業損失天數",
+        # "營業損失",
+        # "每日工作收入",
+        # "工作損失天數",
+        # "工作損失",
+        # "零件",
+        # "材料",
+        # "交通費用",
+        # "財產損失",
+        # "其他",
+        # "備註"
     ],
 
     "number_fields": [
@@ -119,7 +119,7 @@ def get_fields():
     return final_result_fields, template_dict, fields_setting
     
 if __name__ in "__main__":
-    final_result_fields, template_dict, _ = get_fields()
+    final_result_fields, template_dict, fields_setting = get_fields()
     print(f"len of the template dict: {len(str(template_dict))}")
     
-    print(template_dict)
+    print(final_result_fields)

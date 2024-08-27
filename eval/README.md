@@ -23,7 +23,7 @@ python ./eval/proprocessed_data.py && python ./eval/eval.py && python ./eval/res
 
 windows
 ```
-python ./data/processed_to_format.py --type format_data_text --data_path ./data/finetuning_training_data_golden.jsonl --output_path ./data/instruction/ ; python ./eval/generate.py
+python ./processed_to_format.py  --type format_data_text --data_path ./data/finetuning_training_data_golden.jsonl --output_path ./data/instruction/
 
 python ./eval/generate.py # 記得先改程式碼內的參數
 

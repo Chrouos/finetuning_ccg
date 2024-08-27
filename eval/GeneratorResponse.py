@@ -53,7 +53,9 @@ class GeneratorResponse:
             completion = self.openai_client.chat.completions.create(
                 model=model_name,
                 messages=[
-                    {"role": "user", "content": prompt}
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": ""}, 
+                    {"role": "assistant", "content": ""}
                 ]
             )
             generated_text = completion.choices[0].message.content
