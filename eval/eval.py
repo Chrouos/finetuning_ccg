@@ -102,20 +102,22 @@ for finetuning_model_name in finetuning_model_name_list:
             is_pass = len(gloden_data[index_outer]['input']) > 9000  # 檢查字數
             output_data = gloden_data[index_outer]['output']
             if is_pass and any(value != "" and value != 0 for key, value in output_data.items() if key != '被告肇責'): continue
-            # if any(value != "" and value != 0 for key, value in original_processed_data[index_outer]['processed'].items() if key != '被告肇責'): 
-            #     error_weight += 0.2
+            if any(value != "" and value != 0 for key, value in original_processed_data[index_outer]['processed'].items() if key != '被告肇責') == False: 
+                error_weight += 0.05
                 
             
             # 計數
             for item_key in final_result_fields:
                 golden_y_true_list[item_key].append(original_processed_data[index_outer]['processed'][item_key])
                 processed_y_pred_list[item_key].append(gloden_data[index_outer]['output'][item_key])
-                
+        
+        print("error_weight:", error_weight)        
         sequence_list.append({
             "file_path": file_path,
             "golden_y_true_list": golden_y_true_list,
             "processed_y_pred_list": processed_y_pred_list
         })
+        
             
         # @ 計算
         eval_result_dict = {field: 0 for field in final_result_fields}       # 結論
