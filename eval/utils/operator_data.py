@@ -37,10 +37,12 @@ def log_cosh_loss(y_true, y_pred):
     
     # 動態縮放因子，僅根據 y_true 計算，防止溢位
     data_range = np.max(np.abs(y_true))
-    if data_range > 1000:
-        scaling_factor = 1e-5  # 進一步縮小縮放因子
-    elif data_range > 10:
-        scaling_factor = 1e-3
+    if data_range > 1000000:
+        scaling_factor = 1e-7  # 調整縮放因子
+    elif data_range > 10000:
+        scaling_factor = 1e-5  # 調整縮放因子
+    elif data_range > 100:
+        scaling_factor = 1e-3  # 調整縮放因子
     else:
         scaling_factor = 1.0
     

@@ -56,7 +56,8 @@ class GeneratorResponse:
                     {"role": "system", "content": prompt},
                     {"role": "user", "content": ""}, 
                     {"role": "assistant", "content": ""}
-                ]
+                ],
+                temperature=0  
             )
             generated_text = completion.choices[0].message.content
         except Exception as e :
@@ -103,7 +104,10 @@ class GeneratorResponse:
         try:
             gemini_model = genai.GenerativeModel(
                 model_name=model_name,
-                safety_settings=safety_setting
+                safety_settings=safety_setting,
+                generation_config={
+                    "temperature": 0.5
+                }
             )
             
             response = gemini_model.generate_content(prompt)

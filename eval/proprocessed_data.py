@@ -6,24 +6,22 @@ import os
 #: Args.
 finetuning_model_name_list = [
     
-    # "gpt-3.5-turbo-0125-basic",
-    # "gpt-3.5-turbo-0125-advanced",
     
     # "gpt-0125-finetuning-advanced", 
-    # "meta-llama-format-instruct-advanced", 
-    # "meta-chinese-format-advanced",
+    "meta-llama-format-instruct-advanced", 
+    "meta-chinese-format-advanced",
     
-    # "re-format",
+    "re-format",
     
     "gpt-4o-mini-basic",
     "gpt-4o-mini-advanced",
     "gpt-4o-mini-oneShot",
     
-    # "gemini-1.5-flash-basic",
-    # "gemini-1.5-flash-advanced",
-    # "gemini-1.5-flash-oneShot",
+    "gemini-1.5-flash-basic",
+    "gemini-1.5-flash-advanced",
+    "gemini-1.5-flash-oneShot",
     
-    # "ft:gpt-4o-mini-2024-07-18:widm:advanced-train:9zZnglyr-advanced"
+    # "ft-gpt-4o-mini-2024-07-18-advanced"
 ]
 
 

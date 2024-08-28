@@ -3,11 +3,11 @@ import json
 import os
 from tqdm import tqdm
 
-GENERATE_MODE = "GPT" # GPT | GEMINI | RE |
+GENERATE_MODE = "GEMINI" # GPT | GEMINI | RE |
 
 #: Local Model Configuration
 prompt_level = "basic"                           # basic | advanced | oneShot
-model_name = "gpt-4o-mini"                          # gpt-4o-mini | gemini-1.5-flash | gpt-3.5-turbo-0125
+model_name = "gemini-1.5-flash"                          # gpt-4o-mini | gemini-1.5-flash | gpt-3.5-turbo-0125
 checkpoint = "original"                             # output name
 
 #: Data
@@ -31,7 +31,7 @@ with open(instruction_data_path, 'r', encoding='utf-8-sig') as f:
     
 result = []
 console_output = []
-for data in tqdm(datas[:25]):
+for data in tqdm(datas):
     prompt = f"{data['input']}"
     load_response = []
     

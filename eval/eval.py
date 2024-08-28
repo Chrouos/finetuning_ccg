@@ -16,24 +16,22 @@ from utils.operator_data import *
 gloden_answer = "./data/instruction/format/eval.jsonl"
 finetuning_model_name_list = [
     
-    # "gpt-3.5-turbo-0125-basic",
-    # "gpt-3.5-turbo-0125-advanced",
     
     # "gpt-0125-finetuning-advanced", 
-    # "meta-llama-format-instruct-advanced", 
-    # "meta-chinese-format-advanced",
+    "meta-llama-format-instruct-advanced", 
+    "meta-chinese-format-advanced",
     
-    # "re-format",
+    "re-format",
     
     "gpt-4o-mini-basic",
     "gpt-4o-mini-advanced",
     "gpt-4o-mini-oneShot",
     
-    # "gemini-1.5-flash-basic",
-    # "gemini-1.5-flash-advanced",
-    # "gemini-1.5-flash-oneShot",
+    "gemini-1.5-flash-basic",
+    "gemini-1.5-flash-advanced",
+    "gemini-1.5-flash-oneShot",
     
-    # "ft:gpt-4o-mini-2024-07-18:widm:advanced-train:9zZnglyr-advanced"
+    "ft-gpt-4o-mini-2024-07-18-advanced"
 ]
 
 consoletext=[]
@@ -97,19 +95,22 @@ for finetuning_model_name in finetuning_model_name_list:
         processed_y_pred_list = {field: [] for field in final_result_fields} # = 準備序列
         
         # @ 獲得序列
+        error_weight = 1
         for index_outer, row in enumerate(original_processed_data):
             
             #. 檢查忽略條件
             is_pass = len(gloden_data[index_outer]['input']) > 9000  # 檢查字數
             output_data = gloden_data[index_outer]['output']
             if is_pass and any(value != "" and value != 0 for key, value in output_data.items() if key != '被告肇責'): continue
+            # if any(value != "" and value != 0 for key, value in original_processed_data[index_outer]['processed'].items() if key != '被告肇責'): 
+            #     error_weight += 0.2
                 
             
             # 計數
             for item_key in final_result_fields:
                 golden_y_true_list[item_key].append(original_processed_data[index_outer]['processed'][item_key])
                 processed_y_pred_list[item_key].append(gloden_data[index_outer]['output'][item_key])
-            
+                
         sequence_list.append({
             "file_path": file_path,
             "golden_y_true_list": golden_y_true_list,
@@ -126,11 +127,11 @@ for finetuning_model_name in finetuning_model_name_list:
             
             # @ 字串 
             if item_key in fields_setting['string_fields'] + fields_setting['date_fields'] + fields_setting['fraction_fields']:
-                eval_result_dict[item_key] = calculate_average_cosine_similarity(golden_y_true_list[item_key], processed_y_pred_list[item_key])
+                eval_result_dict[item_key] = calculate_average_cosine_similarity(golden_y_true_list[item_key], processed_y_pred_list[item_key]) 
                 
             # @ 數值
             elif item_key in fields_setting['number_fields']  + fields_setting['day_fields']:
-                eval_result_dict[item_key] = log_cosh_loss(golden_y_true_list[item_key], processed_y_pred_list[item_key])
+                eval_result_dict[item_key] = log_cosh_loss(golden_y_true_list[item_key], processed_y_pred_list[item_key]) * error_weight
                 
             consoletext.append(f"[{file_path}][{item_key}]\nGOLDEN=\n{golden_y_true_list[item_key]}\nGENERATE=\n{processed_y_pred_list[item_key]}\n\n")
             
