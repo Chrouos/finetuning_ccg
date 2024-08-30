@@ -57,12 +57,16 @@ mapping = {
 
 # 替換 Name 欄位的值並排序
 df['Name'] = df['Name'].replace(mapping)
-order = mapping.values()
+order = list(mapping.values()) 
 df = df.set_index('Name').loc[order].reset_index()
+
+df = df.round(3)
+
 
 # 轉置表格
 df_transposed = df.set_index('Name').T.reset_index()
 df_transposed.columns.name = None  # 移除欄位名稱
+
 
 # 存入 Excel 檔案
 df_transposed.to_excel(output_file, index=False)

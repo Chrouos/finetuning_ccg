@@ -27,7 +27,7 @@ def success_rate(A, B):
     return rate
 
 def calculate_average_cosine_similarity(text_list_1, text_list_2):
-    vectorizer = CountVectorizer(tokenizer=chinese_tokenizer)
+    vectorizer = CountVectorizer(stop_words='english')
     total_similarity = 0
     valid_pairs = 0
 
@@ -47,7 +47,7 @@ def calculate_average_cosine_similarity(text_list_1, text_list_2):
             total_similarity += 0
             valid_pairs += 1    
     
-        elif text1.strip() and text2.strip():  # 檢查非空字串
+        else:  # 檢查非空字串
             corpus = [text1, text2]
             vectors = vectorizer.fit_transform(corpus)
             if vectors.shape[1] > 0:  # 檢查詞彙表是否為空
