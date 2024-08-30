@@ -4,13 +4,30 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.metrics import mean_absolute_percentage_error
 import os
+import jieba
+
+def chinese_tokenizer(text):
+    # 使用 jieba 進行中文分詞
+    return jieba.lcut(text)
 
 import re
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import numpy as np
 
+def success_rate(A, B):
+    # 檢查兩個列表的長度是否相等，若不相等則返回 0
+    if len(A) != len(B):
+        return 0
+
+    # 計算相同元素的個數
+    correct_count = sum(1 for a, b in zip(A, B) if a == b)
+    # 計算完全正確的比例
+    rate = correct_count / len(A)
+    
+    return rate
+
 def calculate_average_cosine_similarity(text_list_1, text_list_2):
-    vectorizer = CountVectorizer(stop_words='english')
+    vectorizer = CountVectorizer(tokenizer=chinese_tokenizer)
     total_similarity = 0
     valid_pairs = 0
 
@@ -18,14 +35,26 @@ def calculate_average_cosine_similarity(text_list_1, text_list_2):
         text1 = str(text1)
         text2 = str(text2)
         
-        if text1.strip() and text2.strip():  # 檢查非空字串
+        if text1.strip() == '' and  text2.strip() == '':
+            total_similarity += 1
+            valid_pairs += 1
+            
+        elif text1.strip() == '' and  text2.strip() != '':
+            total_similarity += 0
+            valid_pairs += 1
+        
+        elif text1.strip() != '' and  text2.strip() == '':
+            total_similarity += 0
+            valid_pairs += 1    
+    
+        elif text1.strip() and text2.strip():  # 檢查非空字串
             corpus = [text1, text2]
             vectors = vectorizer.fit_transform(corpus)
             if vectors.shape[1] > 0:  # 檢查詞彙表是否為空
                 similarity = cosine_similarity(vectors)
                 total_similarity += similarity[0][1]
                 valid_pairs += 1
-
+                
     if valid_pairs == 0:
         return 0  # 如果沒有有效的字串對，返回0或其他預設值
 

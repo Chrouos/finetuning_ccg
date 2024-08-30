@@ -102,8 +102,8 @@ for finetuning_model_name in finetuning_model_name_list:
             is_pass = len(gloden_data[index_outer]['input']) > 9000  # 檢查字數
             output_data = gloden_data[index_outer]['output']
             if is_pass and any(value != "" and value != 0 for key, value in output_data.items() if key != '被告肇責'): continue
-            if any(value != "" and value != 0 for key, value in original_processed_data[index_outer]['processed'].items() if key != '被告肇責') == False: 
-                error_weight += 0.05
+            # if any(value != "" and value != 0 for key, value in original_processed_data[index_outer]['processed'].items() if key != '被告肇責') == False: 
+            #     error_weight += 0.05
                 
             
             # 計數
@@ -111,7 +111,6 @@ for finetuning_model_name in finetuning_model_name_list:
                 golden_y_true_list[item_key].append(original_processed_data[index_outer]['processed'][item_key])
                 processed_y_pred_list[item_key].append(gloden_data[index_outer]['output'][item_key])
         
-        print("error_weight:", error_weight)        
         sequence_list.append({
             "file_path": file_path,
             "golden_y_true_list": golden_y_true_list,
@@ -133,7 +132,7 @@ for finetuning_model_name in finetuning_model_name_list:
                 
             # @ 數值
             elif item_key in fields_setting['number_fields']  + fields_setting['day_fields']:
-                eval_result_dict[item_key] = log_cosh_loss(golden_y_true_list[item_key], processed_y_pred_list[item_key]) * error_weight
+                eval_result_dict[item_key] = success_rate(golden_y_true_list[item_key], processed_y_pred_list[item_key]) * error_weight
                 
             consoletext.append(f"[{file_path}][{item_key}]\nGOLDEN=\n{golden_y_true_list[item_key]}\nGENERATE=\n{processed_y_pred_list[item_key]}\n\n")
             

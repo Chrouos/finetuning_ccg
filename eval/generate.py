@@ -6,7 +6,7 @@ from tqdm import tqdm
 GENERATE_MODE = "GEMINI" # GPT | GEMINI | RE |
 
 #: Local Model Configuration
-prompt_level = "basic"                           # basic | advanced | oneShot
+prompt_level = "advanced"                           # basic | advanced | oneShot
 model_name = "gemini-1.5-flash"                          # gpt-4o-mini | gemini-1.5-flash | gpt-3.5-turbo-0125
 checkpoint = "original"                             # output name
 
