@@ -16,7 +16,6 @@ from utils.operator_data import *
 gloden_answer = "./data/instruction/format/eval.jsonl"
 finetuning_model_name_list = [
     
-    
     # "gpt-0125-finetuning-advanced", 
     "meta-llama-format-instruct-advanced", 
     "meta-chinese-format-advanced",
@@ -102,24 +101,23 @@ for finetuning_model_name in finetuning_model_name_list:
             is_pass = len(gloden_data[index_outer]['input']) > 9000  # 檢查字數
             output_data = gloden_data[index_outer]['output']
             if is_pass and any(value != "" and value != 0 for key, value in output_data.items() if key != '被告肇責'): continue
-            # if any(value != "" and value != 0 for key, value in original_processed_data[index_outer]['processed'].items() if key != '被告肇責') == False: 
-            #     error_weight += 0.05
-                
+            if any(value != "" and value != 0 for key, value in original_processed_data[index_outer]['processed'].items() if key != '被告肇責') == False: 
+                error_weight += 0.05
             
             # 計數
             for item_key in final_result_fields:
-                golden_y_true_list[item_key].append(original_processed_data[index_outer]['processed'][item_key])
-                processed_y_pred_list[item_key].append(gloden_data[index_outer]['output'][item_key])
+                golden_y_true_list[item_key].append(gloden_data[index_outer]['output'][item_key])
+                processed_y_pred_list[item_key].append(original_processed_data[index_outer]['processed'][item_key]) 
         
         sequence_list.append({
             "file_path": file_path,
             "golden_y_true_list": golden_y_true_list,
             "processed_y_pred_list": processed_y_pred_list
         })
-        
             
         # @ 計算
         eval_result_dict = {field: 0 for field in final_result_fields}       # 結論
+        eval_distance_result_dict =  {field: 0 for field in final_result_fields}
         eval_result_count_dict = {field: {"golden": 0, "processed": 0} for field in final_result_fields} # 共有幾筆
         for item_key in final_result_fields:
             
@@ -132,7 +130,8 @@ for finetuning_model_name in finetuning_model_name_list:
                 
             # @ 數值
             elif item_key in fields_setting['number_fields']  + fields_setting['day_fields']:
-                eval_result_dict[item_key] = success_rate(golden_y_true_list[item_key], processed_y_pred_list[item_key]) * error_weight
+                eval_result_dict[item_key] = success_rate(golden_y_true_list[item_key], processed_y_pred_list[item_key])
+                eval_distance_result_dict[item_key] = log_cosh_loss(golden_y_true_list[item_key], processed_y_pred_list[item_key]) * error_weight
                 
             consoletext.append(f"[{file_path}][{item_key}]\nGOLDEN=\n{golden_y_true_list[item_key]}\nGENERATE=\n{processed_y_pred_list[item_key]}\n\n")
             
@@ -141,6 +140,10 @@ for finetuning_model_name in finetuning_model_name_list:
             
         with open(eval_output_path + processed_file_name, 'w', encoding='utf-8-sig', newline='') as f:
             for key, average in eval_result_dict.items():
+                f.write(json.dumps({key: average}, ensure_ascii=False) + '\n')
+                
+        with open(eval_output_path + 'distance_' + processed_file_name, 'w', encoding='utf-8-sig', newline='') as f:
+            for key, average in eval_distance_result_dict.items():
                 f.write(json.dumps({key: average}, ensure_ascii=False) + '\n')
                 
 with open('consoletext.txt', 'w', encoding='utf-8') as file:

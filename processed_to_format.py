@@ -60,12 +60,10 @@ def prompt_ruler():
 
 def basicPrompt(judgement_doc="", json_dict={}):
     prompt = textwrap.dedent(f"""
-    
     [CONTENT]=```{judgement_doc}```
     [Extraction-JSON]=```{json_dict}```
     
     根據給定的 [CONTENT] 填充 [Extraction-JSON] 結構。要求如下:
-    + 以賠償給原告的數據填寫
     + 擷取折舊前的金額：工資、鈑金、塗裝、烤漆
     + 若無結果則留空白
     
@@ -82,20 +80,19 @@ def advancedPrompt(judgement_doc="", json_dict={}):
     [Extraction-JSON]=```{json_dict}```
     
     根據給定的 [CONTENT] 填充 [Extraction-JSON] 結構。要求如下:
-    + 以賠償給原告的數據填寫
-    + 擷取折舊前的金額：工資、鈑金、塗裝、烤漆（除此之外擷取折舊後的金額）
-    + 事發經過要擷取得更完整
-    + 折舊方法為定率遞減法或平均法
+    + 擷取折舊前金額的欄位：工資、鈑金、塗裝、烤漆
+    + 擷取折舊後（法官判決）金額的欄位：耐用年數, 修車費用, 賠償金額總額, 保險給付金額, 居家看護天數, 居家看護費用, 每日居家看護金額
+    + "事發經過"擷取，包含原告使用車輛、發生位置、事發當下狀況與造成後果（如車輛受損等）
+    + 折舊方法為"定率遞減法"或"平均法"(沒有就空字串)
     + 修車費用填入判決後針對修復車輛的工資、鈑金、塗裝、烤漆等之總額，填入折舊（判決後）的金額
     + 賠償金額總額填入判決書中已列出之總額，為原告請求被告給付之金額需在...起至清償日止
     + 保險給付金額填入保險已經賠償金額
-    + 若無結果則留空白
     + 如果車損寫在一起出現，「工資與鈑金的費用為3500元」，這時填寫最前面的那個欄位，因此結果為工資為3500，鈑金為0
-    + 被告肇責為0~100
     + 傷勢為原告在這場車禍中所造成的傷勢狀況
-    + ["塗裝", "工資", "烤漆", "鈑金", "耐用年數", "修車費用", "醫療費用", "賠償金額總額", "保險給付金額", "居家看護天數", "居家看護費用", "每日居家看護金額", "被告肇責"] 都只要輸出純數字！
+    + 被告肇責為0至100
+    + 耐用年數輸出為"o年"
     
-    ！！！沒有結果就不要生成！！！！
+    ！！！沒有結果就不要生成，若無結果則留空白！！！！
     要擷取文本原文，不要修改內容
     返回結果為一行JSON格式字串，無換行或特殊符號。
     """)
@@ -193,29 +190,34 @@ def prepare_data(data_path, type, output_path):
         print(f"{rule_level} 資料分割完成！")
         print(train_data_with_subject[0])
 
+import re
+def clean_text(text):
+    cleaned_text = re.sub(r'[\t\n\"]', '', text)
+    return cleaned_text
+
 def format_data_text(prompt, data_item):
-    filtered_output = {k: data_item['output'][k] for k in final_result_fields if k in sorted(data_item['output'].keys())}
+    filtered_output = {k: clean_text(data_item['output'][k]) for k in final_result_fields if k in sorted(data_item['output'].keys())}
     clean_output = {k: "" for k in final_result_fields}
     
     formatted_text = prompt(data_item['input'], clean_output)
-    return {'input': formatted_text, 'output': filtered_output, 'content': data_item['input']}
+    return {'input': clean_text(formatted_text), 'output': filtered_output, 'content': data_item['input']}
 
 def format_data_sio(prompt, data_item):
-    filtered_output = {k: data_item['output'][k] for k in final_result_fields if k in sorted(data_item['output'].keys())}
+    filtered_output = {k: clean_text(data_item['output'][k]) for k in final_result_fields if k in sorted(data_item['output'].keys())}
     clean_output = {k: "" for k in final_result_fields}
             
     formatted_text = prompt(data_item['input'], clean_output)
-    return {'subject': "", 'input': formatted_text, 'output': filtered_output, 'content': data_item['input']}
+    return {'subject': "", 'input': clean_text(formatted_text), 'output': filtered_output, 'content': data_item['input']}
 
 def format_data_chat(prompt, data_item):
-    filtered_output = {k: data_item['output'][k] for k in final_result_fields if k in sorted(data_item['output'].keys())}
+    filtered_output = {k: clean_text(data_item['output'][k]) for k in final_result_fields if k in sorted(data_item['output'].keys())}
     clean_output = {k: "" for k in final_result_fields}
             
     formatted_text = prompt(data_item['input'], clean_output)
     return {
         "messages": [
             {"role": "system", "content": ""}, 
-            {"role": "user", "content": formatted_text}, 
+            {"role": "user", "content": clean_text(formatted_text)}, 
             {"role": "assistant", "content": f"{filtered_output}"}
         ],
         'content': data_item['input']

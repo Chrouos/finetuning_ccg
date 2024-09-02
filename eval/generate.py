@@ -3,11 +3,11 @@ import json
 import os
 from tqdm import tqdm
 
-GENERATE_MODE = "GPT" # GPT | GEMINI | RE |
+GENERATE_MODE = "RE" # GPT | GEMINI | RE |
 
 #: Local Model Configuration
-prompt_level = "advanced"                           # basic | advanced | oneShot
-model_name = "gpt-4o-mini"                          # gpt-4o-mini | gemini-1.5-flash | gpt-3.5-turbo-0125
+prompt_level = "format"                           # basic | advanced | oneShot | format
+model_name = "re"                          # gpt-4o-mini | gemini-1.5-flash | gpt-3.5-turbo-0125 | re
 checkpoint = "original"                             # output name
 
 #: Data

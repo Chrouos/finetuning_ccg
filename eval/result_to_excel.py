@@ -10,7 +10,7 @@ int_field = ["塗裝", "工資", "烤漆", "鈑金", "耐用年數", "修車費�
 # 定義資料夾路徑
 file_path = "data/eval/"
 output_file = file_path + "combined_data.xlsx"
-file_paths = [f for f in glob(file_path + '**/*.jsonl', recursive=True) if f != output_file]
+file_paths = [f for f in glob(file_path + '**/*.jsonl', recursive=True) if f != output_file if 'distance' not in f]
 
 # 合併所有檔案的內容成一個列表
 combine_list = []
@@ -62,11 +62,9 @@ df = df.set_index('Name').loc[order].reset_index()
 
 df = df.round(3)
 
-
 # 轉置表格
 df_transposed = df.set_index('Name').T.reset_index()
 df_transposed.columns.name = None  # 移除欄位名稱
-
 
 # 存入 Excel 檔案
 df_transposed.to_excel(output_file, index=False)
