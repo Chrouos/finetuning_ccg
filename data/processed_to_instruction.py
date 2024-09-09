@@ -43,5 +43,9 @@ for processed_path in glob_processed_path_list:
             
         extraction_golden_list.append(current_list)
 
-for item in extraction_golden_list:
-    break
+
+training_data_save_path = "./data/sort_finetuning_training_data_golden.jsonl"
+with open(training_data_save_path, 'w', encoding='utf-8') as f:
+    for response in extraction_golden_list:
+        json_record = response
+        f.write(json.dumps(json_record, ensure_ascii=False) + "\n")
