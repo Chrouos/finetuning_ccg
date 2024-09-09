@@ -24,8 +24,9 @@ def process_data(json_data_list):
 
 source_path = "./data/labeler/*"
 folder_list = glob(source_path)
+filtered_list = [folder for folder in folder_list if 'Judegement' not in folder]
 
-for folder_path in folder_list:
+for folder_path in filtered_list:
     print(f"Working folder on {folder_path}")
     
     # Read the files in the folder
