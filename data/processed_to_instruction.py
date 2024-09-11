@@ -34,7 +34,7 @@ for processed_path in glob_processed_path_list:
     for index, extraction_answer in enumerate(extraction_list):
         current_list = {"input": content_list[index], "output": {}}
         for processed_data_key, processed_data_value in extraction_answer.items():
-            if processed_data_key not in ["備註", "其他"] and processed_data_key in template_key:
+            if processed_data_key not in ["其他"] and processed_data_key in template_key:
                 current_list["output"][processed_data_key] = processed_data_value
                 
         # 確保輸出按照 template_key 的順序排列
