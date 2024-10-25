@@ -18,12 +18,26 @@ gt clone git@github.com:ml-explore/mlx-examples.git
 git clone https://huggingface.co/shenzhi-wang/Llama3-8B-Chinese-Chat
 
 
+### 以下這比較特別，要先過認證
+
 # taide/Llama3-TAIDE-LX-8B-Chat-Alpha1
-# 這比較特別，要先過認證
 git clone https://huggingface.co/taide/Llama3-TAIDE-LX-8B-Chat-Alpha1
 
 # meta-llama/Meta-Llama-3-8B-Instruct
 git clone https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct
+
+# meta-llama/Llama-3.2-1B
+git clone https://huggingface.co/meta-llama/Llama-3.2-1B
+
+# meta-llama/Llama-3.2-3B
+git clone https://huggingface.co/meta-llama/Llama-3.2-3B
+
+# meta-llama/Llama-3.1-8B
+git clone https://huggingface.co/meta-llama/Llama-3.1-8B
+```
+
+## Model
+```
 
 ```
 
@@ -41,6 +55,7 @@ git clone https://github.com/artidoro/qlora.git
 ```
 pip install transformers==4.31.0
 ```
+
 
 ## Docker
 ```
@@ -140,3 +155,5 @@ python ./eval/generate.py # 記得先改程式碼內的參數
 
 python ./eval/proprocessed_data.py && python ./eval/eval.py && python ./eval/result_to_excel.py
 ```
+
+
