@@ -1,0 +1,40 @@
+﻿
+python ./qlora/qlora.py \
+    --model_name_or_path ./model/Llama-3.2-1B-Instruct/ \
+    --output_dir ./final_output/Llama-3.2-1B-Instruct \
+    --dataset ./data/instruction/format/train.jsonl \
+    --max_steps 1800 \
+    --save_steps 300 \
+    --logging_steps 10 \
+    --save_strategy steps \
+    --data_seed 42 \
+    --save_total_limit 40 \
+    --evaluation_strategy steps \
+    --eval_dataset_size 100 \
+    --per_device_eval_batch_size 1 \
+    --dataloader_num_workers 3 \
+    --group_by_length \
+    --logging_strategy steps \
+    --remove_unused_columns False \
+    --do_train \
+    --do_eval \
+    --lora_alpha 16 \
+    --lora_modules all \
+    --double_quant \
+    --quant_type nf4 \
+    --bf16 \
+    --bits 4 \
+    --warmup_ratio 0.03 \
+    --lr_scheduler_type constant \
+    --gradient_checkpointing \
+    --source_max_len 16 \
+    --target_max_len 512 \
+    --per_device_train_batch_size 1 \
+    --gradient_accumulation_steps 16 \
+    --eval_steps 187 \
+    --learning_rate 0.0002 \
+    --adam_beta2 0.999 \
+    --max_grad_norm 0.3 \
+    --lora_dropout 0.2 \
+    --weight_decay 0.0 \
+    --seed 0

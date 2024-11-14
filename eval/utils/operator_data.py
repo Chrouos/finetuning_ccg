@@ -14,6 +14,31 @@ import re
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import numpy as np
 
+def kohens_kappa(A, B):
+    # 檢查兩個列表的長度是否相等，若不相等則返回 0
+    if len(A) != len(B):
+        return 0
+
+    # 計算觀察到的相符比例 P_o
+    total = len(A)
+    correct_count = sum(1 for a, b in zip(A, B) if a == b)
+    P_o = correct_count / total
+
+    # 計算每個類別的預期機率
+    unique_labels = set(A) | set(B)  # 所有可能的類別
+    P_e = sum(
+        (A.count(label) / total) * (B.count(label) / total)
+        for label in unique_labels
+    )
+
+    # 計算 Kappa 值
+    if P_e == 1:
+        return 1  # 完全一致的情況
+    kappa = (P_o - P_e) / (1 - P_e)
+
+    return kappa
+
+
 def success_rate(A, B):
     # 檢查兩個列表的長度是否相等，若不相等則返回 0
     if len(A) != len(B):
