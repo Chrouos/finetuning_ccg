@@ -1,7 +1,7 @@
 ﻿
 python ./qlora/qlora.py \
-    --model_name_or_path ./model/Llama-3.2-1B-Instruct/ \
-    --output_dir ./final_output/Llama-3.2-1B-Instruct \
+    --model_name_or_path ./model/Llama-3.1-8B-Instruct/ \
+    --output_dir ./final_output/Llama-3.1-8B-Instruct \
     --dataset ./data/instruction/format/train.jsonl \
     --max_steps 1800 \
     --save_steps 300 \

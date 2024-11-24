@@ -14,25 +14,27 @@ from transformers import LlamaForCausalLM, PreTrainedTokenizerFast
 from transformers import pipeline
 class GenerateResponseLLAMA:
     
-    def __init__(self, model_folder="model/", fine_tuned_model_path="final_output/", model_name="", 
-                 fine_tune=False, check_point="" ) -> None:
-        
-        self.model_path = f"{model_folder}{model_name}/"
-        self.fine_tuned_model_path = f"{fine_tuned_model_path}{model_name}/{check_point}"
+    def __init__(
+        self,
+        model_folder="model/",
+        fine_tuned_model_path="final_output/",
+        model_name="",
+        fine_tune=False,
+        check_point=""
+    ) -> None:
         
         self.pipe = None
-        self.tokenizer = None
-        
         if fine_tune == False:
-            self.change_model(self.model_path)
-        else: 
-            self.change_model(self.fine_tuned_model_path)
+            self.change_model( f"{model_folder}{model_name}/")
+        else:
+            self.change_model(f"{fine_tuned_model_path}{model_name}/{check_point}")
+
             
     def change_model(self, model_path):
         print(f"Reading in {model_path}")
         self.pipe = pipeline(
             "text-generation",
-            model=self.model_path,
+            model=model_path,
             torch_dtype=torch.bfloat16,  # 使用 bfloat16 提高精度和效能
             device_map="cuda:0" 
         )   

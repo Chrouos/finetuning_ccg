@@ -4,27 +4,56 @@ from glob import glob
 import os
 
 #: Args.
-finetuning_model_name_list = [
-    "Llama-3.1-8B-Instruct-basic",
-    "Llama-3.1-8B-Instruct-advanced",
-    "Llama-3.1-8B-Instruct-oneShot",
-    
-    "Llama-3.2-1B-Instruct-basic",
-    "Llama-3.2-1B-Instruct-advanced",
-    "Llama-3.2-1B-Instruct-oneShot",
-    
-    "Llama-3.2-3B-Instruct-basic",
-    "Llama-3.2-3B-Instruct-advanced",
-    "Llama-3.2-3B-Instruct-oneShot",
-    
-    "gpt-4o-mini-basic",
-    "gpt-4o-mini-advanced",
-    "gpt-4o-mini-oneShot",
-    
-    "Meta-Llama-3-8B-Instruct-oneShot-checkpoint-600",
-    "Meta-Llama-3-8B-Instruct-oneShot-checkpoint-900"
-]
 repeat_times = 3
+finetuning_model_name_list = [
+    
+    # "golden-format-original",
+    
+    # #: GPT-4o-mini
+    # "gpt-4o-mini-basic-original",
+    # "gpt-4o-mini-advanced-original",
+    # "gpt-4o-mini-oneShot-original",
+    
+    # "gpt-4o-mini-basic-ft",
+    # "gpt-4o-mini-advanced-ft",
+    # "gpt-4o-mini-oneShot-ft",
+
+    #: LLama-3.1-8B
+    "Llama-3.1-8B-Instruct-basic-original",
+    "Llama-3.1-8B-Instruct-advanced-original",
+    "Llama-3.1-8B-Instruct-oneShot-original",
+    
+    "Llama-3.1-8B-Instruct-basic-checkpoint-1200",
+    "Llama-3.1-8B-Instruct-advanced-checkpoint-1200",
+    "Llama-3.1-8B-Instruct-oneShot-checkpoint-1200",
+    
+    # #: LLama-3.2-3B
+    # "Llama-3.2-3B-Instruct-basic-original",
+    # "Llama-3.2-3B-Instruct-advanced-original",
+    # "Llama-3.2-3B-Instruct-oneShot-original",
+    
+    # "Llama-3.2-3B-Instruct-basic-checkpoint-1200",
+    # "Llama-3.2-3B-Instruct-advanced-checkpoint-1200",
+    # "Llama-3.2-3B-Instruct-oneShot-checkpoint-1200",
+    
+    # #: LLama-3-8B
+    # "Meta-Llama-3-8B-Instruct-basic-original",
+    # "Meta-Llama-3-8B-Instruct-advanced-original",
+    # "Meta-Llama-3-8B-Instruct-oneShot-original",
+    
+    # "Meta-Llama-3-8B-Instruct-basic-checkpoint-1200",
+    # "Meta-Llama-3-8B-Instruct-advanced-checkpoint-1200",
+    # "Meta-Llama-3-8B-Instruct-oneShot-checkpoint-1200",
+    
+    # #: Taiwan LLAMA 8B
+    # "Llama-3-Taiwan-8B-Instruct-basic-original",
+    # "Llama-3-Taiwan-8B-Instruct-advanced-original",
+    # "Llama-3-Taiwan-8B-Instruct-oneShot-original",
+
+    # "Llama-3-Taiwan-8B-Instruct-basic-checkpoint-1200",
+    # "Llama-3-Taiwan-8B-Instruct-advanced-checkpoint-1200",
+    # "Llama-3-Taiwan-8B-Instruct-oneShot-checkpoint-1200",
+]
 
 for finetuning_model_name in finetuning_model_name_list:
     for time in range(repeat_times):

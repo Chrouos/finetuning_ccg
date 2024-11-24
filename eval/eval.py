@@ -15,25 +15,55 @@ from utils.operator_data import *
 #: Args.
 gloden_answer = "./data/instruction/format/eval.jsonl"
 finetuning_model_name_list = [
-    "Llama-3.1-8B-Instruct-basic",
-    "Llama-3.1-8B-Instruct-advanced",
-    "Llama-3.1-8B-Instruct-oneShot",
     
-    "Llama-3.2-1B-Instruct-basic",
-    "Llama-3.2-1B-Instruct-advanced",
-    "Llama-3.2-1B-Instruct-oneShot",
+    # "golden-format-original",
     
-    "Llama-3.2-3B-Instruct-basic",
-    "Llama-3.2-3B-Instruct-advanced",
-    "Llama-3.2-3B-Instruct-oneShot",
+    # #: GPT-4o-mini
+    # "gpt-4o-mini-basic-original",
+    # "gpt-4o-mini-advanced-original",
+    # "gpt-4o-mini-oneShot-original",
     
-    "gpt-4o-mini-basic", 
-    "gpt-4o-mini-advanced", 
-    "gpt-4o-mini-oneShot", 
+    # "gpt-4o-mini-basic-ft",
+    # "gpt-4o-mini-advanced-ft",
+    # "gpt-4o-mini-oneShot-ft",
+
+    #: LLama-3.1-8B
+    "Llama-3.1-8B-Instruct-basic-original",
+    "Llama-3.1-8B-Instruct-advanced-original",
+    "Llama-3.1-8B-Instruct-oneShot-original",
     
-    "Meta-Llama-3-8B-Instruct-oneShot-checkpoint-600",
-    "Meta-Llama-3-8B-Instruct-oneShot-checkpoint-900"
+    "Llama-3.1-8B-Instruct-basic-checkpoint-1200",
+    "Llama-3.1-8B-Instruct-advanced-checkpoint-1200",
+    "Llama-3.1-8B-Instruct-oneShot-checkpoint-1200",
+    
+    # #: LLama-3.2-3B
+    # "Llama-3.2-3B-Instruct-basic-original",
+    # "Llama-3.2-3B-Instruct-advanced-original",
+    # "Llama-3.2-3B-Instruct-oneShot-original",
+    
+    # "Llama-3.2-3B-Instruct-basic-checkpoint-1200",
+    # "Llama-3.2-3B-Instruct-advanced-checkpoint-1200",
+    # "Llama-3.2-3B-Instruct-oneShot-checkpoint-1200",
+    
+    # #: LLama-3-8B
+    # "Meta-Llama-3-8B-Instruct-basic-original",
+    # "Meta-Llama-3-8B-Instruct-advanced-original",
+    # "Meta-Llama-3-8B-Instruct-oneShot-original",
+    
+    # "Meta-Llama-3-8B-Instruct-basic-checkpoint-1200",
+    # "Meta-Llama-3-8B-Instruct-advanced-checkpoint-1200",
+    # "Meta-Llama-3-8B-Instruct-oneShot-checkpoint-1200",
+    
+    # #: Taiwan LLAMA 8B
+    # "Llama-3-Taiwan-8B-Instruct-basic-original",
+    # "Llama-3-Taiwan-8B-Instruct-advanced-original",
+    # "Llama-3-Taiwan-8B-Instruct-oneShot-original",
+
+    # "Llama-3-Taiwan-8B-Instruct-basic-checkpoint-1200",
+    # "Llama-3-Taiwan-8B-Instruct-advanced-checkpoint-1200",
+    # "Llama-3-Taiwan-8B-Instruct-oneShot-checkpoint-1200",
 ]
+
 repeat_times = 3
 for time in range(repeat_times):
     consoletext=[]
@@ -105,9 +135,9 @@ for time in range(repeat_times):
                 is_pass = len(gloden_data[index_outer]['input']) > 9000  # 檢查字數
                 output_data = gloden_data[index_outer]['output']
                 if is_pass and any(value != "" and value != 0 for key, value in output_data.items() if key != '被告肇責'): continue
-                if any(value != "" and value != 0 for key, value in original_processed_data[index_outer]['processed'].items() if key != '被告肇責') == False: 
+                if gloden_data[index_outer]['output'] != output_data and any(value != "" and value != 0 for key, value in original_processed_data[index_outer]['processed'].items() if key != '被告肇責') == False: 
                     error_weight += 0.005
-                
+                    
                 # 計數
                 for item_key in final_result_fields:
                     golden_y_true_list[item_key].append(gloden_data[index_outer]['output'][item_key])

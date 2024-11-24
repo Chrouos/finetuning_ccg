@@ -77,11 +77,13 @@ def advancedPrompt(judgement_doc="", json_dict={}):
     [Extraction-JSON]{json_dict}[/Extraction-JSON]
 
     指導方針：
-    1. 擷取折舊前的金額：工資、鈑金、塗裝、烤漆 (其他擷取法官判決後).
-    2. 日期格式為: 年月日.
-    3. "事發經過"欄位, 擷取包含原告所駕車輛, 地點, 事故情況及結果(如車輛損傷等)的資訊.
-    4. 在"折舊方法"欄位為"定率遞減法"或"平均法"
-    5. "被告肇責"為 0~100
+    + 擷取折舊前的金額：工資、鈑金、塗裝、烤漆 (其他擷取法官判決後).
+    + 日期格式為: 年月日.
+    + "事發經過"欄位, 擷取包含原告所駕車輛, 地點, 事故情況及結果(如車輛損傷等)的資訊.
+    + 在"折舊方法"欄位為"定率遞減法"或"平均法"
+    + "被告肇責"為 0~100
+    + 賠償金額總額填入法官最終判決給被告的金額，通常為所有數值的加總
+    + 有意義的單位都需擷取
 
     你是文本擷取專家, 回傳繁體中文, 要擷取文本原文, 不要修改內容, 返回結果為一行JSON格式字串, 無換行或特殊符號!
     """)
@@ -106,14 +108,21 @@ def formatPrompt(judgement_doc="", json_dict={}):
     
     prompt = textwrap.dedent(f"""
     [INST]
-    根據給定的判決書填充JSON結構。要求如下:
-    返回結果為一行JSON格式字串，無換行或特殊符號。
-    參考回覆格式'''{json_dict}'''
+    [Extraction-JSON]{json_dict}[/Extraction-JSON]
+
+    指導方針：
+    + 擷取折舊前的金額：工資、鈑金、塗裝、烤漆 (其他擷取法官判決後).
+    + 日期格式為: 年月日.
+    + "事發經過"欄位, 擷取包含原告所駕車輛, 地點, 事故情況及結果(如車輛損傷等)的資訊.
+    + 在"折舊方法"欄位為"定率遞減法"或"平均法".
+    + "被告肇責"為 0~100.
+    + 賠償金額總額填入法官最終判決給被告的金額，通常為所有數值的加總.
+    + 有意義的單位都需擷取.
+
+    你是文本擷取專家, 回傳繁體中文, 要擷取文本原文, 不要修改內容, 返回結果為一行JSON格式字串, 無換行或特殊符號!
     [/INST]
     
-    [CONTENT]
-    {judgement_doc}
-    [/CONTENT]
+    [CONTENT]{judgement_doc}[/CONTENT]
     """)
             
     return prompt
@@ -174,7 +183,6 @@ def prepare_data(data_path, type, output_path):
                 f.write(json.dumps(item, ensure_ascii=False) + '\n')
                 
         print(f"{rule_level} 資料分割完成！")
-        print(train_data_with_subject[0]['input'])
 
 import re
 def clean_text(text):
@@ -200,13 +208,14 @@ def format_data_chat(prompt, data_item):
     clean_output = {k: "" for k in final_result_fields}
             
     formatted_text = prompt(data_item['input'], clean_output)
+    # {"messages": [{"role": "system", "content": ""}, {"role": "user", "content": "What's the capital of France?"}, {"role": "assistant", "content": "Paris, as if everyone doesn't know that already."}]}
     return {
         "messages": [
-            {"role": "system", "content": ""}, 
+            # {"role": "system", "content": ""}, 
             {"role": "user", "content": clean_text(formatted_text)}, 
             {"role": "assistant", "content": f"{filtered_output}"}
         ],
-        'content': data_item['input']
+        # 'content': data_item['input']
     }
 
 if __name__ == "__main__":
