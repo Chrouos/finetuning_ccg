@@ -21,7 +21,7 @@ checkpoint = ""
 #=> original | checkpoint
 '''
 
-repeat_times = 3
+repeat_times = 1
 repeat_method_list = [
     # {"GENERATE_MODE": 'golden', "prompt_level": 'format', "model_name": 'golden', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'RE', "prompt_level": 'format', "model_name": 're', "checkpoint": 'original'},
@@ -41,40 +41,40 @@ repeat_method_list = [
 # ---
     
     # # : LLAMA 3.1 8B
-    {"GENERATE_MODE": 'LLAMA', "prompt_level": 'basic', "model_name": 'Llama-3.1-8B-Instruct', "checkpoint": 'original'},
+    # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'basic', "model_name": 'Llama-3.1-8B-Instruct', "checkpoint": 'original'},
     {"GENERATE_MODE": 'LLAMA', "prompt_level": 'advanced', "model_name": 'Llama-3.1-8B-Instruct', "checkpoint": 'original'},
-    {"GENERATE_MODE": 'LLAMA', "prompt_level": 'oneShot', "model_name": 'Llama-3.1-8B-Instruct', "checkpoint": 'original'},
+    # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'oneShot', "model_name": 'Llama-3.1-8B-Instruct', "checkpoint": 'original'},
 
-    {"GENERATE_MODE": 'FineTuning', "prompt_level": 'basic', "model_name": 'Llama-3.1-8B-Instruct', "checkpoint": 'checkpoint-1200'},
+    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'basic', "model_name": 'Llama-3.1-8B-Instruct', "checkpoint": 'checkpoint-1200'},
     {"GENERATE_MODE": 'FineTuning', "prompt_level": 'advanced', "model_name": 'Llama-3.1-8B-Instruct', "checkpoint": 'checkpoint-1200'},
-    {"GENERATE_MODE": 'FineTuning', "prompt_level": 'oneShot', "model_name": 'Llama-3.1-8B-Instruct', "checkpoint": 'checkpoint-1200'},
+    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'oneShot', "model_name": 'Llama-3.1-8B-Instruct', "checkpoint": 'checkpoint-1200'},
     
     # #: LLAMA 3 Taiwan 8B
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'basic', "model_name": 'Llama-3-Taiwan-8B-Instruct', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'advanced', "model_name": 'Llama-3-Taiwan-8B-Instruct', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'oneShot', "model_name": 'Llama-3-Taiwan-8B-Instruct', "checkpoint": 'original'},
 
-    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'basic', "model_name": 'Llama-3-Taiwan-8B-Instruct', "checkpoint": 'checkpoint-900'},
-    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'advanced', "model_name": 'Llama-3-Taiwan-8B-Instruct', "checkpoint": 'checkpoint-900'},
-    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'oneShot', "model_name": 'Llama-3-Taiwan-8B-Instruct', "checkpoint": 'checkpoint-900'},
+    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'basic', "model_name": 'Llama-3-Taiwan-8B-Instruct', "checkpoint": 'checkpoint-1200'},
+    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'advanced', "model_name": 'Llama-3-Taiwan-8B-Instruct', "checkpoint": 'checkpoint-1200'},
+    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'oneShot', "model_name": 'Llama-3-Taiwan-8B-Instruct', "checkpoint": 'checkpoint-1200'},
 
     # #: LLAMA 3.2 3B
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'basic', "model_name": 'Llama-3.2-3B-Instruct', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'advanced', "model_name": 'Llama-3.2-3B-Instruct', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'oneShot', "model_name": 'Llama-3.2-3B-Instruct', "checkpoint": 'original'},
 
-    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'basic', "model_name": 'Llama-3.2-3B-Instruct', "checkpoint": 'checkpoint-900'},
-    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'advanced', "model_name": 'Llama-3.2-3B-Instruct', "checkpoint": 'checkpoint-900'},
-    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'oneShot', "model_name": 'Llama-3.2-3B-Instruct', "checkpoint": 'checkpoint-900'},
+    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'basic', "model_name": 'Llama-3.2-3B-Instruct', "checkpoint": 'checkpoint-1200'},
+    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'advanced', "model_name": 'Llama-3.2-3B-Instruct', "checkpoint": 'checkpoint-1200'},
+    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'oneShot', "model_name": 'Llama-3.2-3B-Instruct', "checkpoint": 'checkpoint-1200'},
 
     #: LLAMA 3 8B
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'basic', "model_name": 'Meta-Llama-3-8B-Instruct', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'advanced', "model_name": 'Meta-Llama-3-8B-Instruct', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'oneShot', "model_name": 'Meta-Llama-3-8B-Instruct', "checkpoint": 'original'},    
     
-    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'basic', "model_name": 'Meta-Llama-3-8B-Instruct', "checkpoint": 'checkpoint-900'},
-    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'advanced', "model_name": 'Meta-Llama-3-8B-Instruct', "checkpoint": 'checkpoint-900'},
-    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'oneShot', "model_name": 'Meta-Llama-3-8B-Instruct', "checkpoint": 'checkpoint-900'},    
+    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'basic', "model_name": 'Meta-Llama-3-8B-Instruct', "checkpoint": 'checkpoint-1200'},
+    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'advanced', "model_name": 'Meta-Llama-3-8B-Instruct', "checkpoint": 'checkpoint-1200'},
+    # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'oneShot', "model_name": 'Meta-Llama-3-8B-Instruct', "checkpoint": 'checkpoint-1200'},    
 
 ]
 
@@ -83,6 +83,7 @@ for method_dict in repeat_method_list:
     prompt_level = method_dict['prompt_level']
     model_name = method_dict['model_name']
     checkpoint = method_dict['checkpoint']
+    
     print(f"GENERATE_MODE = {GENERATE_MODE}")
     print(f"prompt_level = {prompt_level}")
     print(f"model_name = {model_name}")
@@ -135,9 +136,9 @@ for method_dict in repeat_method_list:
             
             try:
                 if GENERATE_MODE == "LLAMA":
-                    generated_text = generator_response.generate_text( prompt=prompt, temperature=0.5, max_new_tokens=512 )
+                    generated_text = generator_response.generate_text( prompt=prompt, temperature=0.5, max_new_tokens=1024 )
                 elif GENERATE_MODE == "FineTuning":
-                    generated_text = generator_response.generate_text( prompt=prompt, temperature=0.5, max_new_tokens=512 )
+                    generated_text = generator_response.generate_text( prompt=prompt, temperature=0.5, max_new_tokens=1024 )
                 elif GENERATE_MODE == "GPT":
                     generated_text = generator_response.generate_text( prompt=prompt, temperature=0.5)
                 else:

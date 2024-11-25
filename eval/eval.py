@@ -14,6 +14,7 @@ from utils.operator_data import *
 
 #: Args.
 gloden_answer = "./data/instruction/format/eval.jsonl"
+repeat_times = 1
 finetuning_model_name_list = [
     
     # "golden-format-original",
@@ -28,13 +29,13 @@ finetuning_model_name_list = [
     # "gpt-4o-mini-oneShot-ft",
 
     #: LLama-3.1-8B
-    "Llama-3.1-8B-Instruct-basic-original",
+    # "Llama-3.1-8B-Instruct-basic-original",
     "Llama-3.1-8B-Instruct-advanced-original",
-    "Llama-3.1-8B-Instruct-oneShot-original",
+    # "Llama-3.1-8B-Instruct-oneShot-original",
     
-    "Llama-3.1-8B-Instruct-basic-checkpoint-1200",
+    # "Llama-3.1-8B-Instruct-basic-checkpoint-1200",
     "Llama-3.1-8B-Instruct-advanced-checkpoint-1200",
-    "Llama-3.1-8B-Instruct-oneShot-checkpoint-1200",
+    # "Llama-3.1-8B-Instruct-oneShot-checkpoint-1200",
     
     # #: LLama-3.2-3B
     # "Llama-3.2-3B-Instruct-basic-original",
@@ -64,7 +65,6 @@ finetuning_model_name_list = [
     # "Llama-3-Taiwan-8B-Instruct-oneShot-checkpoint-1200",
 ]
 
-repeat_times = 3
 for time in range(repeat_times):
     consoletext=[]
     sequence_list=[]
@@ -134,8 +134,9 @@ for time in range(repeat_times):
                 #. 檢查忽略條件
                 is_pass = len(gloden_data[index_outer]['input']) > 9000  # 檢查字數
                 output_data = gloden_data[index_outer]['output']
-                if is_pass and any(value != "" and value != 0 for key, value in output_data.items() if key != '被告肇責'): continue
-                if gloden_data[index_outer]['output'] != output_data and any(value != "" and value != 0 for key, value in original_processed_data[index_outer]['processed'].items() if key != '被告肇責') == False: 
+                if is_pass or any(value != "" and value != 0 for key, value in output_data.items() if key != '被告肇責') == False: 
+                    continue
+                if gloden_data[index_outer]['output'] != original_processed_data[index_outer]['processed'] and any(value != "" and value != 0 for key, value in original_processed_data[index_outer]['processed'].items() if key != '被告肇責') == False: 
                     error_weight += 0.005
                     
                 # 計數

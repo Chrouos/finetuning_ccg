@@ -40,7 +40,7 @@ class GenerateResponseLLAMA:
         )   
 
         
-    def generate_text(self, prompt, max_new_tokens=512, temperature=0.5, system_content="你是專精於法律文件文本擷取的專家, 用繁體中文回應, 盡量填滿欄位!"):
+    def generate_text(self, prompt, max_new_tokens=1024, temperature=0.3, system_content="你是專精於法律文件文本擷取的專家, 用繁體中文回應, 盡量填滿欄位!"):
         
         messages = [
             {"role": "system", "content": system_content},
@@ -51,7 +51,7 @@ class GenerateResponseLLAMA:
             messages,
             max_new_tokens=max_new_tokens,
             temperature=temperature,
-            pad_token_id = self.pipe.tokenizer.eos_token_id
+            # pad_token_id = self.pipe.tokenizer.eos_token_id
         )
         
         return outputs[0]["generated_text"][-1]['content']

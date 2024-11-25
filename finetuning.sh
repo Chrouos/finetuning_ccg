@@ -32,7 +32,7 @@ python ./qlora/qlora.py \
     --per_device_train_batch_size 1 \
     --gradient_accumulation_steps 16 \
     --eval_steps 187 \
-    --learning_rate 0.0002 \
+    --learning_rate 0.00001 \
     --adam_beta2 0.999 \
     --max_grad_norm 0.3 \
     --lora_dropout 0.2 \

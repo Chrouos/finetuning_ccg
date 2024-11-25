@@ -4,7 +4,7 @@ from glob import glob
 import os
 
 #: Args.
-repeat_times = 3
+repeat_times = 1
 finetuning_model_name_list = [
     
     # "golden-format-original",
@@ -19,13 +19,13 @@ finetuning_model_name_list = [
     # "gpt-4o-mini-oneShot-ft",
 
     #: LLama-3.1-8B
-    "Llama-3.1-8B-Instruct-basic-original",
+    # "Llama-3.1-8B-Instruct-basic-original",
     "Llama-3.1-8B-Instruct-advanced-original",
-    "Llama-3.1-8B-Instruct-oneShot-original",
+    # "Llama-3.1-8B-Instruct-oneShot-original",
     
-    "Llama-3.1-8B-Instruct-basic-checkpoint-1200",
+    # "Llama-3.1-8B-Instruct-basic-checkpoint-1200",
     "Llama-3.1-8B-Instruct-advanced-checkpoint-1200",
-    "Llama-3.1-8B-Instruct-oneShot-checkpoint-1200",
+    # "Llama-3.1-8B-Instruct-oneShot-checkpoint-1200",
     
     # #: LLama-3.2-3B
     # "Llama-3.2-3B-Instruct-basic-original",
@@ -67,37 +67,34 @@ for finetuning_model_name in finetuning_model_name_list:
                 eval_datas = [json.loads(line) for line in f]
 
 
-            def extract_json(data_list):
-                extracted_jsons = []
-                for data in data_list:
-                    processed_data = data.get('processed', '')
-                    if not isinstance(processed_data, str):
-                        processed_data = str(processed_data)
+                def extract_json(data_list):
+                    extracted_jsons = []
+                    for data in data_list:
+                        processed_data = data.get('processed', '')
+                        if not isinstance(processed_data, str):
+                            processed_data = str(processed_data)
 
-                    # Clean up any escaping backslashes
-                    cleaned_data = processed_data.replace("\\", "")
+                        # 清除 ` ```json` 或 ` ``` ` 的出現
+                        cleaned_data = processed_data.replace("\\", "").replace("```json", "").replace("```", "")
 
-                    # Use regex to find JSON objects
-                    matches = re.findall(r"{.*?}(?=\s*```)|{.*}", cleaned_data, re.DOTALL)
-                    if matches:
-                        json_part = matches[0]  # Get the first JSON-like match
-                        
-                        # Check and balance ending quotation marks
-                        if json_part.count('"') % 2 != 0:
-                            json_part += '"'  # Complete with an ending quote if uneven
+                        # 使用正則表達式來抓取 JSON 對象
+                        matches = re.findall(r"{.*?}(?=\s*```)|{.*}", cleaned_data, re.DOTALL)
+                        if matches:
+                            json_part = matches[0]  # 取得第一個 JSON 物件匹配
+                            # 檢查並補全引號
+                            if json_part.count('"') % 2 != 0:
+                                json_part += '"'  # 如果引號數不平衡，補一個結束引號
 
-                        try:
-                            # Attempt to parse as JSON, skip if it fails
-                            json_data = json.loads(json_part.replace("'", "\""))
-                            extracted_jsons.append(json_data)
-                        except json.JSONDecodeError:
-                            json_data = {}
-                            extracted_jsons.append(json_data)
-                    else:
-                        json_data = {}  # Skip this entry if no JSON is found
-                        extracted_jsons.append(json_data)
-                        
-                return extracted_jsons
+                            try:
+                                # 嘗試解析 JSON，若失敗則跳過
+                                json_data = json.loads(json_part.replace("'", "\""))
+                                extracted_jsons.append(json_data)
+                            except json.JSONDecodeError:
+                                extracted_jsons.append({})  # 若解析失敗，則附加空字典
+                        else:
+                            extracted_jsons.append({})  # 若無匹配的 JSON，則附加空字典
+
+                    return extracted_jsons
 
             # 提取 JSON 資料
             json_data_list = extract_json(eval_datas)
