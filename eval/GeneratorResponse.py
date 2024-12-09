@@ -2,6 +2,7 @@
 from openai import OpenAI
 import google.generativeai as genai
 import re
+from accelerate import infer_auto_device_map
 
 import torch
 
@@ -9,7 +10,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from peft import PeftModel
 from transformers import LlamaForCausalLM, PreTrainedTokenizerFast
 from transformers import pipeline
 class GenerateResponseLLAMA:
@@ -20,27 +22,81 @@ class GenerateResponseLLAMA:
         fine_tuned_model_path="final_output/",
         model_name="",
         fine_tune=False,
-        check_point=""
+        check_point="",
+        adapter_config=None
     ) -> None:
         
         self.pipe = None
-        if fine_tune == False:
-            self.change_model( f"{model_folder}{model_name}/")
-        else:
-            self.change_model(f"{fine_tuned_model_path}{model_name}/{check_point}")
+        self.tokenizer = None
 
+        # 加載模型
+        if not fine_tune:
+            self.change_model(f"{model_folder}{model_name}/")
+        else:
+            self.change_model(
+                base_model_path=f"{model_folder}{model_name}/",
+                adapter_path=f"{fine_tuned_model_path}{model_name}/{check_point}",
+                adapter_config=adapter_config
+            )
             
-    def change_model(self, model_path):
-        print(f"Reading in {model_path}")
-        self.pipe = pipeline(
-            "text-generation",
-            model=model_path,
-            torch_dtype=torch.bfloat16,  # 使用 bfloat16 提高精度和效能
-            device_map="cuda:0" 
-        )   
+
+    def change_model(self, base_model_path, adapter_path=None, adapter_config=None):
+        print(f"正在嘗試加載模型，路徑：{base_model_path}")
+        
+        # 檢查基礎模型路徑是否存在
+        if not os.path.exists(base_model_path):
+            raise ValueError(f"基礎模型路徑不存在：{base_model_path}")
+        
+        try:
+            # 加載基礎模型
+            model = AutoModelForCausalLM.from_pretrained(base_model_path, torch_dtype=torch.float16)
+            device_map = infer_auto_device_map(model, max_memory={0: "20GiB"})
+            
+            # 確保模型參數正確加載到設備上
+            model = AutoModelForCausalLM.from_pretrained(
+                base_model_path,
+                torch_dtype=torch.float16,
+                device_map=device_map
+            )
+            
+            # 加載分詞器
+            self.tokenizer = AutoTokenizer.from_pretrained(base_model_path)
+
+            # 如果提供適配器路徑，則加載適配器
+            if adapter_path:
+                if not os.path.exists(adapter_path):
+                    raise ValueError(f"適配器路徑不存在：{adapter_path}")
+                model = PeftModel.from_pretrained(model, adapter_path, config=adapter_config)
+                print(f"適配器加載成功，路徑：{adapter_path}")
+            
+            # 初始化生成管道
+            self.pipe = pipeline(
+                "text-generation",
+                model=model,
+                tokenizer=self.tokenizer,
+                torch_dtype=torch.float16,
+                device_map="auto"  # 使用自動設備映射
+            )
+            print(f"模型加載成功，基礎路徑：{base_model_path}, 適配器：{adapter_path if adapter_path else '無'}")
+        except ValueError as e:
+            print(f"模型加載失敗: {e}")
+            raise
+        except Exception as e:
+            print(f"未預期的錯誤: {e}")
+            raise
 
         
-    def generate_text(self, prompt, max_new_tokens=1024, temperature=0.3, system_content="你是專精於法律文件文本擷取的專家, 用繁體中文回應, 盡量填滿欄位!"):
+    def generate_text(self, prompt, max_new_tokens=2048, temperature=0.5, system_content=""):
+        """
+        生成文本。
+        :param prompt: 用戶輸入的文本
+        :param max_new_tokens: 生成的最大新字數
+        :param temperature: 隨機性參數
+        :param system_content: 模型角色的系統提示
+        :return: 生成的文本
+        """
+        if self.pipe is None:
+            raise ValueError("模型尚未加載，請先初始化或切換模型。")
         
         messages = [
             {"role": "system", "content": system_content},
@@ -51,10 +107,15 @@ class GenerateResponseLLAMA:
             messages,
             max_new_tokens=max_new_tokens,
             temperature=temperature,
-            # pad_token_id = self.pipe.tokenizer.eos_token_id
+            pad_token_id=self.tokenizer.eos_token_id
         )
         
-        return outputs[0]["generated_text"][-1]['content']
+        assistant_content = None
+        for text in outputs[0]["generated_text"]:
+            if text["role"] == "assistant":
+                assistant_content = text["content"]
+                break
+        return assistant_content
         
 class GenerateResponseGPT:
     
@@ -65,14 +126,14 @@ class GenerateResponseGPT:
     def change_openai_client(self, new_openai_key):
         self.openai_client = OpenAI(api_key=new_openai_key)
         
-    def generate_text(self, prompt, temperature=0.5):
+    def generate_text(self, prompt, temperature=0.5, system_content=""):
         
         try:
             completion = self.openai_client.chat.completions.create(
                 model=self.model_name,
                 messages=[
-                    {"role": "system", "content": prompt},
-                    {"role": "user", "content": ""}, 
+                    {"role": "system", "content": system_content},
+                    {"role": "user", "content": prompt}, 
                     {"role": "assistant", "content": ""}
                 ],
                 temperature=temperature

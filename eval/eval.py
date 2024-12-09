@@ -13,56 +13,37 @@ final_result_fields, template_dict, fields_setting = get_fields()
 from utils.operator_data import *
 
 #: Args.
-gloden_answer = "./data/instruction/format/eval.jsonl"
+gloden_answer = "./data/instruction/advanced/eval.jsonl"
 repeat_times = 1
 finetuning_model_name_list = [
     
-    # "golden-format-original",
+    "re-format-original",
+    "golden-format-original",
     
-    # #: GPT-4o-mini
-    # "gpt-4o-mini-basic-original",
-    # "gpt-4o-mini-advanced-original",
-    # "gpt-4o-mini-oneShot-original",
+    #: GPT-4o-mini
+    "gpt-4o-mini-basic-original",
+    "gpt-4o-mini-advanced-original",
+    "gpt-4o-mini-oneShot-original",
     
-    # "gpt-4o-mini-basic-ft",
-    # "gpt-4o-mini-advanced-ft",
-    # "gpt-4o-mini-oneShot-ft",
+    "gpt-4o-mini-advanced-ft",
 
-    #: LLama-3.1-8B
-    # "Llama-3.1-8B-Instruct-basic-original",
-    "Llama-3.1-8B-Instruct-advanced-original",
-    # "Llama-3.1-8B-Instruct-oneShot-original",
+    #: LLama-3-8B
+    "Meta-Llama-3-8B-Instruct-basic-original",
+    "Meta-Llama-3-8B-Instruct-advanced-original",
+    "Meta-Llama-3-8B-Instruct-oneShot-original",
     
-    # "Llama-3.1-8B-Instruct-basic-checkpoint-1200",
-    "Llama-3.1-8B-Instruct-advanced-checkpoint-1200",
-    # "Llama-3.1-8B-Instruct-oneShot-checkpoint-1200",
+    "Meta-Llama-3-8B-Instruct-basic-checkpoint-900",
+    "Meta-Llama-3-8B-Instruct-advanced-checkpoint-900",
+    "Meta-Llama-3-8B-Instruct-oneShot-checkpoint-900",
     
-    # #: LLama-3.2-3B
-    # "Llama-3.2-3B-Instruct-basic-original",
-    # "Llama-3.2-3B-Instruct-advanced-original",
-    # "Llama-3.2-3B-Instruct-oneShot-original",
-    
-    # "Llama-3.2-3B-Instruct-basic-checkpoint-1200",
-    # "Llama-3.2-3B-Instruct-advanced-checkpoint-1200",
-    # "Llama-3.2-3B-Instruct-oneShot-checkpoint-1200",
-    
-    # #: LLama-3-8B
-    # "Meta-Llama-3-8B-Instruct-basic-original",
-    # "Meta-Llama-3-8B-Instruct-advanced-original",
-    # "Meta-Llama-3-8B-Instruct-oneShot-original",
-    
-    # "Meta-Llama-3-8B-Instruct-basic-checkpoint-1200",
-    # "Meta-Llama-3-8B-Instruct-advanced-checkpoint-1200",
-    # "Meta-Llama-3-8B-Instruct-oneShot-checkpoint-1200",
-    
-    # #: Taiwan LLAMA 8B
-    # "Llama-3-Taiwan-8B-Instruct-basic-original",
-    # "Llama-3-Taiwan-8B-Instruct-advanced-original",
-    # "Llama-3-Taiwan-8B-Instruct-oneShot-original",
+    #: Taiwan LLAMA 8B
+    "Llama-3-Taiwan-8B-Instruct-basic-original",
+    "Llama-3-Taiwan-8B-Instruct-advanced-original",
+    "Llama-3-Taiwan-8B-Instruct-oneShot-original",
 
-    # "Llama-3-Taiwan-8B-Instruct-basic-checkpoint-1200",
-    # "Llama-3-Taiwan-8B-Instruct-advanced-checkpoint-1200",
-    # "Llama-3-Taiwan-8B-Instruct-oneShot-checkpoint-1200",
+    "Llama-3-Taiwan-8B-Instruct-basic-checkpoint-900",
+    "Llama-3-Taiwan-8B-Instruct-advanced-checkpoint-900",
+    "Llama-3-Taiwan-8B-Instruct-oneShot-checkpoint-900",
 ]
 
 for time in range(repeat_times):
@@ -72,12 +53,14 @@ for time in range(repeat_times):
 
         pre_output_path = f"./data/output/{finetuning_model_name}/{time}/"
         file_paths = [f for f in glob(pre_output_path + '*', recursive=True) if 'processed_' in f ]
+        
 
         for file_path in file_paths:
             
             processed_file_name = os.path.basename(file_path)
             eval_output_path = f"./data/eval/{finetuning_model_name}/{time}/"
             os.makedirs(os.path.dirname(eval_output_path), exist_ok=True)
+            print(eval_output_path)
 
             #- load datas.
             with open(pre_output_path + processed_file_name, 'r', encoding='utf-8-sig') as f:
@@ -161,11 +144,15 @@ for time in range(repeat_times):
                 eval_result_count_dict[item_key]["processed"] = len(processed_y_pred_list[item_key])
                 
                 # @ 字串 
-                if item_key in fields_setting['string_fields'] + fields_setting['date_fields'] + fields_setting['fraction_fields']:
+                if item_key in fields_setting['string_fields'] + fields_setting['date_fields']:
                     eval_result_dict[item_key] = max(calculate_average_cosine_similarity(golden_y_true_list[item_key], processed_y_pred_list[item_key]) - error_weight, 0)
                     
                 # @ 數值
-                elif item_key in fields_setting['number_fields']  + fields_setting['day_fields']:
+                elif item_key in fields_setting['number_fields']  + fields_setting['day_fields'] + fields_setting['fraction_fields']:
+                    if item_key == "被告肇責":
+                        print(golden_y_true_list[item_key])
+                        print(processed_y_pred_list[item_key])
+                        
                     # eval_result_dict[item_key] = max(kohens_kappa(golden_y_true_list[item_key], processed_y_pred_list[item_key]) - error_weight, 0)
                     eval_result_dict[item_key] = max(success_rate(golden_y_true_list[item_key], processed_y_pred_list[item_key]) - error_weight, 0)
 

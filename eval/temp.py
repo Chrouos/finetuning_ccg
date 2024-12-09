@@ -1,36 +1,30 @@
-﻿from transformers import pipeline
-import torch
+﻿from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
-def generate_text(model_path, prompt, max_new_tokens=512, temperature=0.1, system_content="你是專精於法律文件文本擷取的專家，用繁體中文回應，填滿欄位"):
-    pipe = pipeline(
-        "text-generation",
-        model=model_path,
-        torch_dtype=torch.bfloat16,  # 使用 bfloat16 提高精度和效能
-        device_map="auto"  # 自動選擇可用的裝置
-    )   
-    
-    messages = [
-        {"role": "system", "content": system_content},
-        {"role": "user", "content": prompt},
-    ]
-    
-    outputs = pipe(
-        messages,
-        max_new_tokens=max_new_tokens,
-        temperature=temperature,
-        pad_token_id = pipe.tokenizer.eos_token_id
-    )
-    
-    return outputs[0]["generated_text"][-1]['content']
-    
-model_path = "./model/Llama-3.1-8B-Instruct"
-input_text = "[CONTENT]臺灣臺中地方法院簡易民事判決107年度沙簡字第301號原告旺旺友聯產物保險股份有限公司法定代理人劉自明訴訟代理人紀淳譯被告王基爵上列當事人間請求損害賠償事件，本院於民國108年4月16日言詞辯論終結，判決如下：主文被告應給付原告新臺幣104,763元，及自民國107年5月27日起至清償日止，按年息百分之五計算之利息。訴訟費用由被告負擔。本判決得假執行。事實及理由壹、程序事項:被告經合法通知，未於言詞辯論期日到場，核無民事訴訟法第386條各款所列情形，依民事訴訟法第433條之3規定，本院依職權由原告一造辯論而為判決。貳、實體事項：一、兩造爭執要旨：（一）原告主張：被告無駕駛執照仍於民國105年11月23日14時52分許，駕駛原告承保車牌號碼0000-00號自用小客車，行經臺中市大里區大里路與爽文路口時，因違反號誌管制行駛，與訴外人鄭木鐘駕駛之車牌號碼000-000號普通重型機車發生碰撞，以致訴外人鄭木鐘受傷，案經臺中市政府警察局霧峰分局交通分隊受理在案。本件車禍造成訴外人鄭木鐘受傷部分，原告已依強制汽車責任保險法之規定賠付強制險醫療費用給付共計新臺幣（下同）104,763元。依強制汽車責任保險法第29條第1項第5款之規定及民法第184條第2項侵權行為之法律關係，於保險給付金額範圍內請求被告賠償因此所生之損害。並聲明：被告應給付原告104,763元，及自起訴狀繕本送達翌日起至清償日止按年息百分之五計算之利息。（二）被告未於言詞辯論期日到場，亦未提出書狀作何聲明或陳述。二、得心證之理由：（一）原告主張之事實業據提出道路交通事故當事人登記聯單、道路交通事故現場圖、初步分析研判表、強制汽車保險理賠計算書追償計算書、醫療給付費用表、診斷證明書、賠償給付同意書等件為證，並經本院依職權向臺中市政府警察局霧峰分局調閱道路交通事故卷宗及本院106年度交訴字第89號刑事卷宗查核無訛。被告已於相當時期受合法之通知，於言詞辯論期日不到場，亦未提出準備書狀為任何爭執，依民事訴訟法第426條之23、第426條第2項、第280條第3項、第1項之規定，視為自認，本件經調查證據之結果，堪信原告之主張屬實。（二）按因故意或過失不法侵害他人之權利者，負損害賠償責任，民法第184條第1項前段定有明文。再按被保險人有下列情事之一，致被保險汽車發生汽車交通事故者，保險人仍應依本法規定負保險給付之責。但得在給付金額範圍內，代位行使請求權人對被保險人之請求權：五、違反道路交通管理處罰條例第21條或第21條之1規定而駕車；汽車駕駛人，有下列情形之一者，處新臺幣6千元以上1萬2千元以下罰鍰，並當場禁止其駕駛：一、未領有駕駛執照駕駛小型車或機車，強制汽車責任保險法第29條第1項第5款及道路交通管理處罰條例第21條第1項第1款分別定有明文。又給付有確定期限者，債務人自期限屆滿時起，負遲延責任。給付無確定期限者，債務人於債權人得請求給付時，經其催告而未為給付，自受催告時起，負遲延責任。其經債權人起訴而送達訴狀，或依督促程式送達支付命令，或為其他相類之行為者，與催告有同一之效力，民法第229條第1項及第2項定有明文。又遲延之債務，以支付金錢為標的者，債權人得請求依法定利率計算之遲延利息。但約定利率較高者，仍從其約定利率；應付利息之債務，其利率未經約定，亦無法律可據者，週年利率為5％，民法第233條第1項及第203條亦定有明文。查被告因前揭無照駕車及過失肇致本件車禍之發生，並致訴外人鄭木鐘受有傷害，原告復已依強制汽車責任保險法及保險契約，賠付訴外人鄭木鐘因前開傷害之醫療費用，原告自得於給付保險金後，代位行使請求權人之請求權，而向無照駕車肇事之被告求償，則原告據此請求被告給付原告104,763元，及自起訴狀繕本送達被告翌日即107年5月27日起至清償日止，按年息百分之5計算之法定遲延利息，為有理由，應予准許。三、本件係就民事訴訟法第427條第1項訴訟適用簡易程序所為被告敗訴之判決，依同法第389條第1項第3款之規定，依職權宣告假執行。四、訴訟費用負擔之依據：民事訴訟法第78條。中華民國108年4月30日臺灣臺中地方法院沙鹿簡易庭法官劉國賓以上為正本，係照原本作成。如不服本判決，應於判決送達後20日內向本院提出上訴狀並表明上訴理由（須附繕本）；如委任律師提起上訴者，應一併繳納上訴審裁判費。中華民國108年4月30日書記官林勝彥[/CONTENT][Extraction-JSON]{'事故日期': '', '事發經過': '', '事故車出廠日期': '', '傷勢': '', '職業': '', '折舊方法': '', '被告肇責': '', '塗裝': '', '工資': '', '烤漆': '', '鈑金': '', '耐用年數': '', '修車費用': '', '賠償金額總額': '', '保險給付金額': '', '居家看護天數': '', '居家看護費用': '', '每日居家看護金額': ''}[/Extraction-JSON]根據給定的 [CONTENT] 填充 [Extraction-JSON]:1. 擷取折舊前的金額：工資、鈑金、塗裝、烤漆 (其他擷取法官判決後).2. 日期格式為: 民國年/月/日.你是文本擷取專家, 回傳繁體中文,要擷取文本原文，不要修改內容, 返回結果為一行JSON格式字串,無換行或特殊符號!"
-output = generate_text(
-    model_path=model_path, 
-    prompt=input_text, 
-    max_new_tokens=1024, 
-    temperature=0.5
-)
+# 路徑設置
+base_model_path = "./model/Llama-3.1-8B-Instruct/"  # 未微調模型路徑
+adapter_path = "./final_output/Llama-3.1-8B-Instruct/checkpoint-900/"  # 微調適配器路徑
 
-print(output)
+# 加載基礎模型
+model = AutoModelForCausalLM.from_pretrained(base_model_path)
 
+# 應用適配器（需要 Transformers 支援 LoRA 適配器）
+from peft import PeftModel
+model = PeftModel.from_pretrained(model, adapter_path)
+print("模型配置信息:", model.config)
+print("適配器配置信息:", model.peft_config)
+
+# 加載分詞器
+tokenizer = AutoTokenizer.from_pretrained(base_model_path)
+
+# 測試生成
+prompt = "測試指令"
+inputs = tokenizer(prompt, return_tensors="pt")
+
+# 測試未加載適配器的模型輸出
+base_model = AutoModelForCausalLM.from_pretrained(base_model_path)
+base_outputs = base_model.generate(**inputs, max_new_tokens=50)
+print("未微調模型輸出:", tokenizer.decode(base_outputs[0]))
+
+# 測試加載適配器的模型輸出
+adapter_outputs = model.generate(**inputs, max_new_tokens=50)
+print("加載適配器的模型輸出:", tokenizer.decode(adapter_outputs[0]))

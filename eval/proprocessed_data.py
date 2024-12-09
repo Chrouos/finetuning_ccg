@@ -7,53 +7,68 @@ import os
 repeat_times = 1
 finetuning_model_name_list = [
     
-    # "golden-format-original",
+    # "re-format-original",
+    "golden-format-original",
     
-    # #: GPT-4o-mini
-    # "gpt-4o-mini-basic-original",
-    # "gpt-4o-mini-advanced-original",
-    # "gpt-4o-mini-oneShot-original",
+    #: GPT-4o-mini
+    "gpt-4o-mini-basic-original",
+    "gpt-4o-mini-advanced-original",
+    "gpt-4o-mini-oneShot-original",
+    "gpt-4o-mini-automatedPrompt-original",
     
-    # "gpt-4o-mini-basic-ft",
-    # "gpt-4o-mini-advanced-ft",
-    # "gpt-4o-mini-oneShot-ft",
+    "gpt-4o-mini-advanced-ft",
 
-    #: LLama-3.1-8B
-    # "Llama-3.1-8B-Instruct-basic-original",
-    "Llama-3.1-8B-Instruct-advanced-original",
-    # "Llama-3.1-8B-Instruct-oneShot-original",
     
-    # "Llama-3.1-8B-Instruct-basic-checkpoint-1200",
-    "Llama-3.1-8B-Instruct-advanced-checkpoint-1200",
-    # "Llama-3.1-8B-Instruct-oneShot-checkpoint-1200",
+    #: LLama-3-8B
+    "Meta-Llama-3-8B-Instruct-basic-original",
+    "Meta-Llama-3-8B-Instruct-advanced-original",
+    "Meta-Llama-3-8B-Instruct-oneShot-original",
     
-    # #: LLama-3.2-3B
-    # "Llama-3.2-3B-Instruct-basic-original",
-    # "Llama-3.2-3B-Instruct-advanced-original",
-    # "Llama-3.2-3B-Instruct-oneShot-original",
+    "Meta-Llama-3-8B-Instruct-basic-checkpoint-900",
+    "Meta-Llama-3-8B-Instruct-advanced-checkpoint-900",
+    "Meta-Llama-3-8B-Instruct-oneShot-checkpoint-900",
     
-    # "Llama-3.2-3B-Instruct-basic-checkpoint-1200",
-    # "Llama-3.2-3B-Instruct-advanced-checkpoint-1200",
-    # "Llama-3.2-3B-Instruct-oneShot-checkpoint-1200",
-    
-    # #: LLama-3-8B
-    # "Meta-Llama-3-8B-Instruct-basic-original",
-    # "Meta-Llama-3-8B-Instruct-advanced-original",
-    # "Meta-Llama-3-8B-Instruct-oneShot-original",
-    
-    # "Meta-Llama-3-8B-Instruct-basic-checkpoint-1200",
-    # "Meta-Llama-3-8B-Instruct-advanced-checkpoint-1200",
-    # "Meta-Llama-3-8B-Instruct-oneShot-checkpoint-1200",
-    
-    # #: Taiwan LLAMA 8B
-    # "Llama-3-Taiwan-8B-Instruct-basic-original",
-    # "Llama-3-Taiwan-8B-Instruct-advanced-original",
-    # "Llama-3-Taiwan-8B-Instruct-oneShot-original",
+    #: Taiwan LLAMA 8B
+    "Llama-3-Taiwan-8B-Instruct-basic-original",
+    "Llama-3-Taiwan-8B-Instruct-advanced-original",
+    "Llama-3-Taiwan-8B-Instruct-oneShot-original",
 
-    # "Llama-3-Taiwan-8B-Instruct-basic-checkpoint-1200",
-    # "Llama-3-Taiwan-8B-Instruct-advanced-checkpoint-1200",
-    # "Llama-3-Taiwan-8B-Instruct-oneShot-checkpoint-1200",
+    "Llama-3-Taiwan-8B-Instruct-basic-checkpoint-900",
+    "Llama-3-Taiwan-8B-Instruct-advanced-checkpoint-900",
+    "Llama-3-Taiwan-8B-Instruct-oneShot-checkpoint-900",
 ]
+
+def extract_json(data_list):
+    extracted_jsons = []
+    for data in data_list:
+        processed_data = data.get('processed', '')
+        if not isinstance(processed_data, str):
+            processed_data = str(processed_data)
+
+        # Clean up unnecessary backslashes and specific symbols
+        cleaned_data = processed_data.replace("\\", "").replace("’", "'").replace("``", '"').strip()
+
+        # Use regex to find potential JSON objects
+        matches = re.findall(r"\{.*?\}(?=\s*```)|\{.*?\}", cleaned_data, re.DOTALL)
+        if matches:
+            # Select the best match based on the length (assuming longer JSON is more complete)
+            best_match = max(matches, key=len)
+            # Replace single quotes with double quotes for valid JSON
+            json_candidate = best_match.replace("'", '"').strip()
+
+            # Handle common issues in extracted JSON
+            json_candidate = re.sub(r',(?=\s*[\}\]])', '', json_candidate)  # Remove trailing commas
+            try:
+                # Attempt to parse the JSON
+                json_data = json.loads(json_candidate)
+                extracted_jsons.append(json_data)
+            except json.JSONDecodeError:
+                # print(f"JSONDecodeError: {json_candidate[:200]}...")  # Truncate for readability
+                extracted_jsons.append({})
+        else:
+            # print(f"No match found in: {cleaned_data[:200]}...")  # Truncate for readability
+            extracted_jsons.append({})
+    return extracted_jsons
 
 for finetuning_model_name in finetuning_model_name_list:
     for time in range(repeat_times):
@@ -65,36 +80,6 @@ for finetuning_model_name in finetuning_model_name_list:
             
             with open(pre_output_path + current_file_name, 'r', encoding='utf-8-sig') as f:
                 eval_datas = [json.loads(line) for line in f]
-
-
-                def extract_json(data_list):
-                    extracted_jsons = []
-                    for data in data_list:
-                        processed_data = data.get('processed', '')
-                        if not isinstance(processed_data, str):
-                            processed_data = str(processed_data)
-
-                        # 清除 ` ```json` 或 ` ``` ` 的出現
-                        cleaned_data = processed_data.replace("\\", "").replace("```json", "").replace("```", "")
-
-                        # 使用正則表達式來抓取 JSON 對象
-                        matches = re.findall(r"{.*?}(?=\s*```)|{.*}", cleaned_data, re.DOTALL)
-                        if matches:
-                            json_part = matches[0]  # 取得第一個 JSON 物件匹配
-                            # 檢查並補全引號
-                            if json_part.count('"') % 2 != 0:
-                                json_part += '"'  # 如果引號數不平衡，補一個結束引號
-
-                            try:
-                                # 嘗試解析 JSON，若失敗則跳過
-                                json_data = json.loads(json_part.replace("'", "\""))
-                                extracted_jsons.append(json_data)
-                            except json.JSONDecodeError:
-                                extracted_jsons.append({})  # 若解析失敗，則附加空字典
-                        else:
-                            extracted_jsons.append({})  # 若無匹配的 JSON，則附加空字典
-
-                    return extracted_jsons
 
             # 提取 JSON 資料
             json_data_list = extract_json(eval_datas)

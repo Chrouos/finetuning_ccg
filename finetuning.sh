@@ -1,10 +1,10 @@
-﻿
-python ./qlora/qlora.py \
-    --model_name_or_path ./model/Llama-3.1-8B-Instruct/ \
-    --output_dir ./final_output/Llama-3.1-8B-Instruct \
-    --dataset ./data/instruction/format/train.jsonl \
-    --max_steps 1800 \
-    --save_steps 300 \
+﻿python ./qlora/qlora.py \
+    --model_name_or_path ./model/Llama-3-Taiwan-8B-Instruct \
+    --output_dir ./final_output/Llama-3-Taiwan-8B-Instruct \
+    --dataset ./data/instruction/advanced/train.jsonl \
+    --dataset_format alpaca \
+    --max_steps 900 \
+    --save_steps 450 \
     --logging_steps 10 \
     --save_strategy steps \
     --data_seed 42 \
@@ -23,18 +23,18 @@ python ./qlora/qlora.py \
     --double_quant \
     --quant_type nf4 \
     --bf16 \
-    --bits 4 \
+    --bits 8 \
     --warmup_ratio 0.03 \
     --lr_scheduler_type constant \
     --gradient_checkpointing \
-    --source_max_len 16 \
-    --target_max_len 512 \
+    --source_max_len 256 \    # 調整 Source 最大長度
+    --target_max_len 512 \    # 調整 Target 最大長度
     --per_device_train_batch_size 1 \
     --gradient_accumulation_steps 16 \
-    --eval_steps 187 \
-    --learning_rate 0.00001 \
+    --eval_steps 100 \        # 評估步驟設為 100
+    --learning_rate 0.0003 \
     --adam_beta2 0.999 \
     --max_grad_norm 0.3 \
-    --lora_dropout 0.2 \
+    --lora_dropout 0.3 \
     --weight_decay 0.0 \
-    --seed 0
+    --seed 42

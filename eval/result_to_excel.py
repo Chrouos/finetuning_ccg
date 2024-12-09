@@ -4,9 +4,12 @@ import json
 import os
 import re
 
+from utils.template_fields import get_fields
+final_result_fields, template_dict, fields_setting = get_fields()
+
 # 定義欄位
-string_field = ["事故日期", "事發經過", "事故車出廠日期", "傷勢", "職業", "折舊方法", "被告肇責"]
-int_field = ["塗裝", "工資", "烤漆", "鈑金", "耐用年數", "修車費用", "賠償金額總額", "保險給付金額", "居家看護天數", "居家看護費用", "每日居家看護金額"]
+string_field = [k for k in ["事故日期", "事發經過", "事故車出廠日期", "傷勢", "職業", "折舊方法", "被告肇責"] if k in final_result_fields]
+int_field = [k for k in ["塗裝", "工資", "烤漆", "鈑金", "耐用年數", "修車費用", "賠償金額總額", "保險給付金額", "居家看護天數", "居家看護費用", "每日居家看護金額"] if k in final_result_fields]
 
 # 資料夾路徑
 file_path = "data/eval/"
@@ -32,6 +35,7 @@ for path in file_paths:
         "Method": method_name,
         "CheckPoint": version
     }
+    print(combined_dict)
 
     # 讀取 JSONL 檔案內容
     with open(path, 'r', encoding='utf-8-sig') as file:
@@ -63,19 +67,21 @@ cols.insert(1, cols.pop(cols.index("Average(字串)")))
 cols.insert(2, cols.pop(cols.index("Average(數值)")))
 df = df[cols]
 
+print(df['Folder'])
+
 
 # 名稱對應表
 mapping = {
-    # "gpt-4o-mini": "gpt-4om",
+    "golden": "golden",
+    "re": "re",
+    "gpt-4o-mini": "gpt-4om",
+    
     # "gemini-1.5-flash": "Gemini",
     
-    "Llama-3.1-8B-Instruct": "L3.1-8B",
-    # "Llama-3.2-3B-Instruct": "L3.2-3B",
-    # "Meta-Llama-3-8B-Instruct": "L3-8B",
     
-    # "Llama-3-Taiwan-8B-Instruct": "L3-8B-Taiwan",
+    "Meta-Llama-3-8B-Instruct": "L3-8B",
+    "Llama-3-Taiwan-8B-Instruct": "L3-8B-Taiwan",
     
-    # "golden": "golden"
 }
 df['Folder'] = df['Folder'].replace(mapping)
 order = list(mapping.values())

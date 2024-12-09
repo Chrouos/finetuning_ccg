@@ -288,18 +288,22 @@ def transform_chinese_number_to_int(value):
 # - 轉換分數到數值
 def blame_fraction_to_int(value):
     
+    
     if value == "無": return 0
     default_value = 100 # = 肇責預設 100 %
     
     clear_value = chinese_char_to_int(str(value).replace("%", "").replace("％", "").replace("﹪", "").replace("百", "100").replace(" ", ""))
-    if clear_value is None or clear_value == "": return default_value 
+    if clear_value is None or clear_value == "": 
+        return default_value 
 
+    
     try:
         split_value = clear_value.split("分之")
         if len(split_value) >= 2:
             
             numerator = cn2an.cn2an(split_value[1], "smart" )# = 分子
             denominator =  cn2an.cn2an(split_value[0], "smart") # = 分母
+            
             
             return round(numerator / denominator * 100)
         
@@ -319,11 +323,18 @@ def blame_fraction_to_int(value):
         if clear_value == "1半":
             return 50
         
-        if isinstance(clear_value, int) == False: return default_value
+        try:
+            clear_value = int(clear_value)
+            if isinstance(clear_value, int) == False: 
+                return default_value
+            return clear_value
+        except Exception as e:
+            return default_value
         
         return str(clear_value)
         
     except Exception as e:
+        print(e, value)
         return str(default_value)
     
 
@@ -399,13 +410,13 @@ def convert_to_days(item):
 
 def date_regular(text, is_default_day=False):
     
-    if text == "無": return ""
+    if text == "無" or text == "": return ""
     
     try:
         text = text.replace(" ", '')
         ch_in_text = cn2an.transform(text)
         
-        pattern_year = r"(?:民國)(\d+)年|(?<!西元)(?<!\d)(\d{1,3})年"
+        pattern_year = r"(?:民國)(\d+)年|(?<!西元)(?<!\d)(\d{1,3})年|(\d{4})年"
         pattern_month = r"(\d+)(?:月)"
         pattern_day = r"(\d+)(?:日)"
         
@@ -427,15 +438,16 @@ def date_regular(text, is_default_day=False):
             match = re.search(r"(\d+)", str(day_match.group(0)))
             day = match.group(0) if match else ""
             
+            
         result = ch_in_text
         if year != 0 and month != 0:
             if day == 15 and not is_default_day:
-                result = chinese_char_to_int(f"{year}年{month}月", zero_normalize=True)
+                result = chinese_char_to_int(f"{year}年{str(month).replace('0', '')}月", zero_normalize=True)
             elif day != 15 or is_default_day:
-                result = chinese_char_to_int(f"{year}年{month}月{day}日", zero_normalize=True)
+                result = chinese_char_to_int(f"{year}年{str(month).replace('0', '')}月{day}日", zero_normalize=True)
         else:
             result = ch_in_text
-            
+
         return str(result)
     
     except Exception as e:
