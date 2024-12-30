@@ -19,12 +19,11 @@ python ./processed_to_format.py  --type format_data_sio --data_path ./data/sort_
 unix
 ```
 # format_data_sio
-python ./eval/automated_prompt.py
 python ./processed_to_format.py  --type format_data_sio --data_path ./data/sort_finetuning_training_data_golden.jsonl --output_path ./data/instruction/
     
 python ./eval/generate.py # 記得先改程式碼內的參數
 
-python ./eval/proprocessed_data.py && python ./eval/eval.py && python ./eval/result_to_excel.py
+python ./eval/proprocessed_data.py && python ./eval/eval.py && python ./eval/result_to_excel.py && ./eval/format_rate.py
 
 ```
 

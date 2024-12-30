@@ -4,10 +4,10 @@ from glob import glob
 import os
 
 #: Args.
-repeat_times = 1
+repeat_times = 3
 finetuning_model_name_list = [
-    
-    # "re-format-original",
+    "Nothing-format-original",
+    "re-format-original",
     "golden-format-original",
     
     #: GPT-4o-mini
@@ -17,7 +17,11 @@ finetuning_model_name_list = [
     "gpt-4o-mini-automatedPrompt-original",
     
     "gpt-4o-mini-advanced-ft",
-
+    
+    #: GEMINI
+    "gemini-1.5-flash-basic-original",
+    "gemini-1.5-flash-advanced-original",
+    "gemini-1.5-flash-oneShot-original",
     
     #: LLama-3-8B
     "Meta-Llama-3-8B-Instruct-basic-original",
@@ -42,6 +46,11 @@ def extract_json(data_list):
     extracted_jsons = []
     for data in data_list:
         processed_data = data.get('processed', '')
+        
+        if isinstance(processed_data, dict):
+            extracted_jsons.append(processed_data)
+            continue
+        
         if not isinstance(processed_data, str):
             processed_data = str(processed_data)
 

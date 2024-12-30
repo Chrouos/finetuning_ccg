@@ -4,6 +4,7 @@ import google.generativeai as genai
 import re
 from accelerate import infer_auto_device_map
 
+import time 
 import torch
 
 import os
@@ -152,7 +153,7 @@ class GenerateResponseGEMINI:
     def change_gemini_client(self, new_gemini_key):
         self.gemini_client = genai.configure(api_key=new_gemini_key)
         
-    def by_gemini_generate_text(self, prompt, temperature=0.5, model_name="gemini-1.5-flash"):
+    def generate_text(self, prompt, temperature=0.5, model_name="gemini-1.5-flash", system_content=""):
         
         safety_setting = [
             { "category": "HARM_CATEGORY_DANGEROUS", "threshold": "BLOCK_NONE", },
@@ -171,12 +172,15 @@ class GenerateResponseGEMINI:
                 }
             )
             
-            response = gemini_model.generate_content(prompt)
+            response = gemini_model.generate_content(prompt + system_content)
             response.resolve()
             generated_text = response.text
             
         except Exception as e:
+            print(e)
             generated_text = {}
+            
+        time.sleep(5)
             
         return generated_text
     

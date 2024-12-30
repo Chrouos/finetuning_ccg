@@ -21,19 +21,19 @@ checkpoint = ""
 #=> original | checkpoint
 '''
 
-repeat_times = 1
+repeat_times = 3
 repeat_method_list = [
+    {"GENERATE_MODE": 'Nothing', "prompt_level": 'format', "model_name": 'Nothing', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'golden', "prompt_level": 'format', "model_name": 'golden', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'RE', "prompt_level": 'format', "model_name": 're', "checkpoint": 'original'},
     
     # {"GENERATE_MODE": 'GPT', "prompt_level": 'basic', "model_name": 'gpt-4o-mini', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'GPT', "prompt_level": 'advanced', "model_name": 'gpt-4o-mini', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'GPT', "prompt_level": 'oneShot', "model_name": 'gpt-4o-mini', "checkpoint": 'original'},
-    # {"GENERATE_MODE": 'GPT', "prompt_level": 'automatedPrompt', "model_name": 'gpt-4o-mini', "checkpoint": 'original'},
     
-    {"GENERATE_MODE": 'GEMINI', "prompt_level": 'basic', "model_name": 'gemini-1.5-flash', "checkpoint": 'original'},
-    {"GENERATE_MODE": 'GEMINI', "prompt_level": 'advanced', "model_name": 'gemini-1.5-flash', "checkpoint": 'original'},
-    {"GENERATE_MODE": 'GEMINI', "prompt_level": 'oneShot', "model_name": 'gemini-1.5-flash', "checkpoint": 'original'},
+    # {"GENERATE_MODE": 'GEMINI', "prompt_level": 'basic', "model_name": 'gemini-1.5-flash', "checkpoint": 'original'},
+    # {"GENERATE_MODE": 'GEMINI', "prompt_level": 'advanced', "model_name": 'gemini-1.5-flash', "checkpoint": 'original'},
+    # {"GENERATE_MODE": 'GEMINI', "prompt_level": 'oneShot', "model_name": 'gemini-1.5-flash', "checkpoint": 'original'},
     
     # {"GENERATE_MODE": 'GPT', "prompt_level": 'basic', "model_name": 'ft:gpt-4o-mini-2024-07-18:widm:advanced-train-new:AUdBaiha', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'GPT', "prompt_level": 'advanced', "model_name": 'ft:gpt-4o-mini-2024-07-18:widm:advanced-train-new:AUdBaiha', "checkpoint": 'original'},
@@ -41,7 +41,7 @@ repeat_method_list = [
 
 # ---
 
-    #: LLAMA 3 8B
+    # #: LLAMA 3 8B
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'basic', "model_name": 'Meta-Llama-3-8B-Instruct', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'advanced', "model_name": 'Meta-Llama-3-8B-Instruct', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'oneShot', "model_name": 'Meta-Llama-3-8B-Instruct', "checkpoint": 'original'},    
@@ -50,7 +50,7 @@ repeat_method_list = [
     # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'advanced', "model_name": 'Meta-Llama-3-8B-Instruct', "checkpoint": 'checkpoint-900'},
     # {"GENERATE_MODE": 'FineTuning', "prompt_level": 'oneShot', "model_name": 'Meta-Llama-3-8B-Instruct', "checkpoint": 'checkpoint-900'},    
 
-    #: LLAMA 3 Taiwan 8B
+    # #: LLAMA 3 Taiwan 8B
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'basic', "model_name": 'Llama-3-Taiwan-8B-Instruct', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'advanced', "model_name": 'Llama-3-Taiwan-8B-Instruct', "checkpoint": 'original'},
     # {"GENERATE_MODE": 'LLAMA', "prompt_level": 'oneShot', "model_name": 'Llama-3-Taiwan-8B-Instruct', "checkpoint": 'original'},
@@ -129,8 +129,12 @@ for method_dict in repeat_method_list:
                     generated_text = generator_response.generate_text( prompt=judge_content, temperature=0.5, max_new_tokens=2048, system_content=instruction)
                 elif GENERATE_MODE == "GPT":
                     generated_text = generator_response.generate_text( prompt=judge_content, temperature=0.5, system_content=instruction)
+                elif GENERATE_MODE == "GEMINI":
+                    generated_text = generator_response.generate_text( prompt=judge_content, temperature=0.5, system_content=instruction)
                 elif GENERATE_MODE == "RE":
                     generated_text = generator_response.by_re_generate_text(judge_content)
+                elif GENERATE_MODE == "Nothing":
+                    generated_text = {key: "" for key in data['output']}
                 else:
                     generated_text = data['output']
                     

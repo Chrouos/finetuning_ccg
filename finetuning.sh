@@ -1,6 +1,6 @@
 ﻿python ./qlora/qlora.py \
-    --model_name_or_path ./model/Llama-3-Taiwan-8B-Instruct \
-    --output_dir ./final_output/Llama-3-Taiwan-8B-Instruct \
+    --model_name_or_path ./model/Meta-Llama-3-8B-Instruct \
+    --output_dir ./final_output/Meta-Llama-3-8B-Instruct \
     --dataset ./data/instruction/advanced/train.jsonl \
     --dataset_format alpaca \
     --max_steps 900 \

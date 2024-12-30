@@ -14,9 +14,9 @@ from utils.operator_data import *
 
 #: Args.
 gloden_answer = "./data/instruction/advanced/eval.jsonl"
-repeat_times = 1
+repeat_times = 3
 finetuning_model_name_list = [
-    
+    "Nothing-format-original",
     "re-format-original",
     "golden-format-original",
     
@@ -26,6 +26,11 @@ finetuning_model_name_list = [
     "gpt-4o-mini-oneShot-original",
     
     "gpt-4o-mini-advanced-ft",
+    
+    #: GEMINI
+    "gemini-1.5-flash-basic-original",
+    "gemini-1.5-flash-advanced-original",
+    "gemini-1.5-flash-oneShot-original",
 
     #: LLama-3-8B
     "Meta-Llama-3-8B-Instruct-basic-original",
@@ -110,7 +115,7 @@ for time in range(repeat_times):
             processed_y_pred_list = {field: [] for field in final_result_fields} # = 準備序列
             
             # @ 獲得序列
-            error_weight = 0
+            error_weight_count = 0
             # print(len(original_processed_data))
             for index_outer, row in enumerate(original_processed_data):
                 
@@ -120,14 +125,14 @@ for time in range(repeat_times):
                 if is_pass or any(value != "" and value != 0 for key, value in output_data.items() if key != '被告肇責') == False: 
                     continue
                 if gloden_data[index_outer]['output'] != original_processed_data[index_outer]['processed'] and any(value != "" and value != 0 for key, value in original_processed_data[index_outer]['processed'].items() if key != '被告肇責') == False: 
-                    error_weight += 0.005
+                    error_weight_count += 1
                     
                 # 計數
                 for item_key in final_result_fields:
                     golden_y_true_list[item_key].append(gloden_data[index_outer]['output'][item_key])
                     processed_y_pred_list[item_key].append(original_processed_data[index_outer]['processed'][item_key]) 
             
-            print(f"error_weight: {error_weight}")
+            print(f"error_weight: {error_weight_count}")
             sequence_list.append({
                 "file_path": file_path,
                 "golden_y_true_list": golden_y_true_list,
@@ -138,25 +143,24 @@ for time in range(repeat_times):
             eval_result_dict = {field: 0 for field in final_result_fields}       # 結論
             eval_distance_result_dict =  {field: 0 for field in final_result_fields}
             eval_result_count_dict = {field: {"golden": 0, "processed": 0} for field in final_result_fields} # 共有幾筆
+            
             for item_key in final_result_fields:
                 
                 eval_result_count_dict[item_key]["golden"] = len(golden_y_true_list[item_key])
                 eval_result_count_dict[item_key]["processed"] = len(processed_y_pred_list[item_key])
+                current_error_weight = error_weight_count / len(golden_y_true_list[item_key])
                 
                 # @ 字串 
                 if item_key in fields_setting['string_fields'] + fields_setting['date_fields']:
-                    eval_result_dict[item_key] = max(calculate_average_cosine_similarity(golden_y_true_list[item_key], processed_y_pred_list[item_key]) - error_weight, 0)
+                    eval_result_dict[item_key] = max(calculate_average_cosine_similarity(golden_y_true_list[item_key], processed_y_pred_list[item_key]) - current_error_weight, 0)
                     
                 # @ 數值
                 elif item_key in fields_setting['number_fields']  + fields_setting['day_fields'] + fields_setting['fraction_fields']:
-                    if item_key == "被告肇責":
-                        print(golden_y_true_list[item_key])
-                        print(processed_y_pred_list[item_key])
-                        
-                    # eval_result_dict[item_key] = max(kohens_kappa(golden_y_true_list[item_key], processed_y_pred_list[item_key]) - error_weight, 0)
-                    eval_result_dict[item_key] = max(success_rate(golden_y_true_list[item_key], processed_y_pred_list[item_key]) - error_weight, 0)
+                   
+                    eval_result_dict[item_key] = max(kohens_kappa(golden_y_true_list[item_key], processed_y_pred_list[item_key]) - current_error_weight, 0)
+                    # eval_result_dict[item_key] = max(success_rate(golden_y_true_list[item_key], processed_y_pred_list[item_key]) - current_error_weight, 0)
 
-                    eval_distance_result_dict[item_key] = log_cosh_loss(golden_y_true_list[item_key], processed_y_pred_list[item_key]) * error_weight
+                    eval_distance_result_dict[item_key] = log_cosh_loss(golden_y_true_list[item_key], processed_y_pred_list[item_key]) * current_error_weight
                     
                 consoletext.append(f"[{file_path}][{item_key}]\nGOLDEN=\n{golden_y_true_list[item_key]}\nGENERATE=\n{processed_y_pred_list[item_key]}\n\n")
                 

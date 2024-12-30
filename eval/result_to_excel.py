@@ -74,13 +74,13 @@ print(df['Folder'])
 mapping = {
     "golden": "golden",
     "re": "re",
+    
     "gpt-4o-mini": "gpt-4om",
-    
-    # "gemini-1.5-flash": "Gemini",
-    
+    "gemini-1.5-flash": "Gemini",
     
     "Meta-Llama-3-8B-Instruct": "L3-8B",
     "Llama-3-Taiwan-8B-Instruct": "L3-8B-Taiwan",
+    "Nothing": "nothing"
     
 }
 df['Folder'] = df['Folder'].replace(mapping)

@@ -334,7 +334,6 @@ def blame_fraction_to_int(value):
         return str(clear_value)
         
     except Exception as e:
-        print(e, value)
         return str(default_value)
     
 
