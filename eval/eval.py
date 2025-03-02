@@ -57,7 +57,7 @@ for time in range(repeat_times):
     for finetuning_model_name in finetuning_model_name_list:
 
         pre_output_path = f"./data/output/{finetuning_model_name}/{time}/"
-        file_paths = [f for f in glob(pre_output_path + '*', recursive=True) if 'processed_' in f ]
+        file_paths = [f for f in glob(pre_output_path + '*', recursive=True) if 'processed_' in f and 'regular' not in f]
         
 
         for file_path in file_paths:
@@ -105,6 +105,13 @@ for time in range(repeat_times):
 
             regular_process_data(gloden_data, fields_setting, template_dict, 'output')
             regular_process_data(processed_data, fields_setting, template_dict, 'processed')
+            
+            #- Save processed files with "regular_" prefix
+            regular_processed_file = os.path.join(pre_output_path, f"regular_processed_{processed_file_name}")
+
+            with open(regular_processed_file, 'w', encoding='utf-8-sig') as f:
+                for item in processed_data:
+                    f.write(json.dumps(item, ensure_ascii=False) + '\n')
                 
             data_total_length = len(processed_data)
                 
@@ -148,7 +155,7 @@ for time in range(repeat_times):
                 
                 eval_result_count_dict[item_key]["golden"] = len(golden_y_true_list[item_key])
                 eval_result_count_dict[item_key]["processed"] = len(processed_y_pred_list[item_key])
-                current_error_weight = error_weight_count / len(golden_y_true_list[item_key])
+                current_error_weight = 0
                 
                 # @ 字串 
                 if item_key in fields_setting['string_fields'] + fields_setting['date_fields']:
@@ -157,8 +164,8 @@ for time in range(repeat_times):
                 # @ 數值
                 elif item_key in fields_setting['number_fields']  + fields_setting['day_fields'] + fields_setting['fraction_fields']:
                    
-                    eval_result_dict[item_key] = max(kohens_kappa(golden_y_true_list[item_key], processed_y_pred_list[item_key]) - current_error_weight, 0)
-                    # eval_result_dict[item_key] = max(success_rate(golden_y_true_list[item_key], processed_y_pred_list[item_key]) - current_error_weight, 0)
+                    # eval_result_dict[item_key] = max(kohens_kappa(golden_y_true_list[item_key], processed_y_pred_list[item_key]) - current_error_weight, 0)
+                    eval_result_dict[item_key] = max(success_rate(golden_y_true_list[item_key], processed_y_pred_list[item_key]) - current_error_weight, 0)
 
                     eval_distance_result_dict[item_key] = log_cosh_loss(golden_y_true_list[item_key], processed_y_pred_list[item_key]) * current_error_weight
                     
